@@ -15,6 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     environment: Testing
 
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: laravel
+          POSTGRES_USER: laravel
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,8 +59,14 @@ jobs:
       - name: Copy Environment File
         run: cp .env.example .env
 
+      - name: Update Database Host for CI
+        run: sed -i 's/DB_HOST=pgsql/DB_HOST=127.0.0.1/' .env
+
       - name: Generate Application Key
         run: php artisan key:generate
+
+      - name: Run Migrations
+        run: php artisan migrate --force
 
       - name: Build Assets
         run: npm run build
