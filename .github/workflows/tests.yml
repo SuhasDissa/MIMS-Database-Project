@@ -65,6 +65,12 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
+      - name: Create Testing Database
+        run: |
+          PGPASSWORD=secret psql -h 127.0.0.1 -U laravel -d laravel -c "CREATE DATABASE testing;"
+        env:
+          PGPASSWORD: secret
+
       - name: Run Migrations
         run: php artisan migrate --force
 
