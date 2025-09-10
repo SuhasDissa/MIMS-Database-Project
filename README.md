@@ -23,10 +23,9 @@ MIMS is a web-based banking application built with Laravel 12 and Livewire that 
 - PHP 8.2+
 - Composer
 - Node.js 18+ & NPM
-- PostgreSQL 13+
-- Docker (for local development with Laravel Sail)
+- SQLite 3.8+ (included with PHP)
 
-## Quick Start with Laravel Sail
+## Quick Start
 
 ### 1. Clone and Setup
 
@@ -36,57 +35,7 @@ cd database-project
 cp .env.example .env
 ```
 
-### 2. Start with Laravel Sail
-
-```bash
-# Install dependencies (if not already done)
-composer install
-
-# Start Laravel Sail services
-./vendor/bin/sail up -d
-
-# Generate application key
-./vendor/bin/sail artisan key:generate
-
-# Run migrations
-./vendor/bin/sail artisan migrate
-
-# Seed the database (optional)
-./vendor/bin/sail artisan db:seed
-
-# Install and build frontend assets
-./vendor/bin/sail npm install
-./vendor/bin/sail npm run build
-```
-
-### 3. Access the Application
-
-- **Laravel App**: http://localhost
-- **PostgreSQL**: localhost:5432 (credentials in .env file)
-
-### 4. Stop Services
-
-```bash
-./vendor/bin/sail down
-```
-
-### 5. Sail Alias (Optional)
-
-For easier usage, add an alias to your shell:
-
-```bash
-# Add to ~/.bashrc or ~/.zshrc
-alias sail='./vendor/bin/sail'
-
-# Then use simply:
-sail up -d
-sail artisan migrate
-sail npm run dev
-```
-
-## Manual Installation
-
-### 1. Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 # Install PHP dependencies
@@ -96,25 +45,17 @@ composer install
 npm install
 ```
 
-### 2. Environment Setup
+### 3. Environment Setup
 
 ```bash
-# Copy environment file
-cp .env.example .env
-
 # Generate application key
 php artisan key:generate
 
-# Configure your database in .env file
-DB_CONNECTION=pgsql
-DB_HOST=localhost
-DB_PORT=5432
-DB_DATABASE=mims
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
+# Create SQLite database file
+touch database/database.sqlite
 ```
 
-### 3. Database Setup
+### 4. Database Setup
 
 ```bash
 # Run migrations
@@ -124,7 +65,7 @@ php artisan migrate
 php artisan db:seed
 ```
 
-### 4. Build Assets
+### 5. Build Assets
 
 ```bash
 # Development build
@@ -134,7 +75,7 @@ npm run dev
 npm run build
 ```
 
-### 5. Start Development Server
+### 6. Start Development Server
 
 ```bash
 # Start Laravel development server
@@ -143,6 +84,10 @@ php artisan serve
 # Or use the custom dev command (with queue worker, pail, and vite)
 composer run dev
 ```
+
+### 7. Access the Application
+
+- **Laravel App**: http://localhost:8000
 
 ## Laravel Basics & Artisan Commands
 
@@ -288,19 +233,13 @@ database-project/
 # Create feature branch
 git checkout -b feature/customer-management
 
-# Create necessary files (use sail if running in Docker)
-./vendor/bin/sail artisan make:model Customer -mfs
-./vendor/bin/sail artisan make:controller CustomerController --resource
-./vendor/bin/sail artisan make:livewire Customers/CustomerList
-
-# Or without sail for local development:
+# Create necessary files
 php artisan make:model Customer -mfs
 php artisan make:controller CustomerController --resource
 php artisan make:livewire Customers/CustomerList
 
 # Run tests
-./vendor/bin/sail artisan test
-# or: php artisan test
+php artisan test
 
 # Commit changes
 git add .
@@ -310,31 +249,25 @@ git commit -m "Add customer management feature"
 ### 2. Database Changes
 ```bash
 # Create migration for new table
-./vendor/bin/sail artisan make:migration create_customers_table
-# or: php artisan make:migration create_customers_table
+php artisan make:migration create_customers_table
 
 # Create migration to modify existing table
-./vendor/bin/sail artisan make:migration add_status_to_customers_table
-# or: php artisan make:migration add_status_to_customers_table
+php artisan make:migration add_status_to_customers_table
 
 # Run migration
-./vendor/bin/sail artisan migrate
-# or: php artisan migrate
+php artisan migrate
 ```
 
 ### 3. Testing
 ```bash
 # Run all tests
-./vendor/bin/sail artisan test
-# or: php artisan test
+php artisan test
 
 # Run specific test file
-./vendor/bin/sail artisan test tests/Feature/CustomerTest.php
-# or: php artisan test tests/Feature/CustomerTest.php
+php artisan test tests/Feature/CustomerTest.php
 
 # Run tests with coverage
-./vendor/bin/sail artisan test --coverage
-# or: php artisan test --coverage
+php artisan test --coverage
 ```
 
 ## Common Tasks
