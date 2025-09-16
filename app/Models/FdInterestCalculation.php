@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\InterestCalculationStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class FdInterestCalculation extends Model
@@ -30,6 +31,7 @@ class FdInterestCalculation extends Model
         'principal_amount' => 'decimal:2',
         'interest_rate' => 'decimal:4',
         'interest_amount' => 'decimal:2',
+        'status' => InterestCalculationStatusEnum::class,
         'calculation_date' => 'datetime',
         'credited_date' => 'datetime',
     ];

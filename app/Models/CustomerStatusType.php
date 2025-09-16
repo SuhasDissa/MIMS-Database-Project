@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CustomerStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class CustomerStatusType extends Model
@@ -19,7 +20,7 @@ class CustomerStatusType extends Model
     ];
 
     protected $casts = [
-        'status_name' => 'string',
+        'status_name' => CustomerStatusEnum::class,
         'created_at' => 'datetime',
     ];
 

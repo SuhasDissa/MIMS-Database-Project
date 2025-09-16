@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AccountStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class SavingsAccount extends Model
@@ -25,6 +26,7 @@ class SavingsAccount extends Model
 
     protected $casts = [
         'balance' => 'decimal:2',
+        'status' => AccountStatusEnum::class,
         'opened_date' => 'date',
         'closed_date' => 'date',
         'last_transaction_date' => 'date',

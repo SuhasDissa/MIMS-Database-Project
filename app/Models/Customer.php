@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\GenderEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
@@ -26,6 +27,7 @@ class Customer extends Model
 
     protected $casts = [
         'date_of_birth' => 'datetime',
+        'gender' => GenderEnum::class,
     ];
 
     public function branch()

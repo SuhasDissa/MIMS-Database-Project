@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MaturityActionEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class FdMaturityAction extends Model
@@ -25,6 +26,7 @@ class FdMaturityAction extends Model
 
     protected $casts = [
         'maturity_date' => 'datetime',
+        'action_taken' => MaturityActionEnum::class,
         'principal_amount' => 'decimal:2',
         'interest_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',

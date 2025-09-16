@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionTypeEnum;
+use App\Enums\TransactionMethodEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class FdTransaction extends Model
@@ -23,6 +25,8 @@ class FdTransaction extends Model
     ];
 
     protected $casts = [
+        'type' => TransactionTypeEnum::class,
+        'method' => TransactionMethodEnum::class,
         'amount' => 'decimal:2',
         'balance_before' => 'decimal:2',
         'balance_after' => 'decimal:2',

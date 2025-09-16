@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\InterestFrequencyEnum;
+use App\Enums\FixedDepositStatusEnum;
+use App\Enums\InterestPayoutOptionEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class FixedDeposit extends Model
@@ -31,6 +34,9 @@ class FixedDeposit extends Model
     protected $casts = [
         'principal_amount' => 'decimal:2',
         'maturity_amount' => 'decimal:2',
+        'interest_freq' => InterestFrequencyEnum::class,
+        'status' => FixedDepositStatusEnum::class,
+        'interest_payout_option' => InterestPayoutOptionEnum::class,
         'start_date' => 'date',
         'maturity_date' => 'date',
         'auto_renewal' => 'boolean',

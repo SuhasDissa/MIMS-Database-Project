@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionTypeEnum;
+use App\Enums\TransactionStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class SavingsTransaction extends Model
@@ -24,6 +26,8 @@ class SavingsTransaction extends Model
     ];
 
     protected $casts = [
+        'type' => TransactionTypeEnum::class,
+        'status' => TransactionStatusEnum::class,
         'amount' => 'decimal:2',
         'balance_before' => 'decimal:2',
         'balance_after' => 'decimal:2',
