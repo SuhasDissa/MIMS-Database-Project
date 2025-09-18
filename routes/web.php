@@ -7,6 +7,14 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::get('/reg_cus', function () {
+    return view('Customer_registration');
+})->name('customer.register');
+
+Route::get('/fd_open', function () {
+    return view('FD_open');
+})->name('fd.open');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
