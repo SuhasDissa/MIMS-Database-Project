@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customers', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->string('first_name', 50);
             $table->string('last_name', 50);
             $table->dateTime('date_of_birth');
@@ -22,12 +22,9 @@ return new class extends Migration
             $table->string('postal_code', 20);
             $table->string('id_type', 20);
             $table->string('id_number', 50);
-            $table->integer('status_id');
-            $table->integer('branch_id');
-            $table->timestamp('created_at')->nullable();
-            $table->timestamp('updated_at')->nullable();
-            
-            $table->foreign('branch_id')->references('id')->on('branch');
+            $table->foreignId('status_id')->constrained('customer_status_types');
+            $table->foreignId('branch_id')->constrained('branch');
+            $table->timestamps();
         });
     }
 

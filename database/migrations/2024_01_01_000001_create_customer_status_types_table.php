@@ -9,12 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customer_status_types', function (Blueprint $table) {
-            $table->integer('id')->primary();
+            $table->id();
             $table->enum('status_name', ['CHILD', 'SENIOR', 'ADULT']);
             $table->string('description', 256)->nullable();
             $table->integer('min_age')->nullable();
             $table->integer('max_age')->nullable();
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
         });
     }
 

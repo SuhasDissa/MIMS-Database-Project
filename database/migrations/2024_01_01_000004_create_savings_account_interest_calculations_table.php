@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('savings_account_interest_calculations', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
-            $table->integer('account_id');
+            $table->id();
+            $table->foreignId('account_id')->constrained('savings_account');
             $table->date('calculation_period_start');
             $table->date('calculation_period_end');
             $table->decimal('principal_amount', 15, 2);
@@ -19,8 +19,8 @@ return new class extends Migration
             $table->decimal('interest_amount', 15, 2);
             $table->enum('status', ['CALCULATED', 'CREDITED', 'FAILED']);
             $table->timestamp('calculation_date')->nullable();
-            $table->timestamp('credited_date')->nullable();
-            $table->integer('transaction_id')->nullable();
+            $table->foreignId('transaction_id')->nullable()->constrained('savings_transaction');
+            $table->timestamps();
         });
     }
 

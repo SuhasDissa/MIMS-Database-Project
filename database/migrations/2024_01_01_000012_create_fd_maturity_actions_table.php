@@ -9,20 +9,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('fd_maturity_actions', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
-            $table->bigInteger('fd_id');
+            $table->id();
+            $table->foreignId('fd_id')->constrained('fixed_deposits');
             $table->dateTime('maturity_date');
             $table->enum('action_taken', ['TRANSFERRED_TO_SAVINGS', 'RENEWED', 'PENDING']);
             $table->decimal('principal_amount', 15, 2);
             $table->decimal('interest_amount', 15, 2);
             $table->decimal('total_amount', 15, 2);
-            $table->bigInteger('new_fd_id')->nullable();
-            $table->bigInteger('transaction_id')->nullable();
+            $table->foreignId('new_fd_id')->nullable()->constrained('fixed_deposits');
+            $table->foreignId('transaction_id')->nullable()->constrained('fd_transaction');
             $table->timestamp('processed_date')->nullable();
-            $table->timestamp('created_at')->nullable();
-            
-            $table->foreign('transaction_id')->references('id')->on('fd_transaction');
-            $table->foreign('new_fd_id')->references('id')->on('fixed_deposits');
+            $table->timestamps();
         });
     }
 

@@ -9,17 +9,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('employee', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->string('first_name', 50);
             $table->string('last_name', 50);
             $table->string('email', 100);
             $table->string('phone', 15);
             $table->string('position', 50);
             $table->string('nic_num', 12);
-            $table->integer('branch_id');
+            $table->foreignId('branch_id')->constrained('branch');
             $table->boolean('is_active')->default(true);
-            
-            $table->foreign('branch_id')->references('id')->on('branch');
+            $table->timestamps();
         });
     }
 

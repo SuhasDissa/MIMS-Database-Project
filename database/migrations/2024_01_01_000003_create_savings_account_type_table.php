@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('savings_account_type', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->string('name', 50);
             $table->integer('customer_status_id');
             $table->decimal('min_balance', 15, 2);
             $table->decimal('interest_rate', 5, 4);
             $table->string('description', 256)->nullable();
             $table->boolean('is_active')->default(true);
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
             
             $table->foreign('customer_status_id')->references('id')->on('customer_status_types');
         });

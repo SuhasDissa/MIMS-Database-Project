@@ -9,12 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('fixed_deposits', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->id();
             $table->string('fd_number', 256);
-            $table->bigInteger('customer_id');
-            $table->bigInteger('fd_type_id');
-            $table->integer('branch_id');
-            $table->bigInteger('linked_account_id')->nullable();
+            $table->foreignId('customer_id')->constrained('customers');
+            $table->foreignId('fd_type_id')->constrained('fixed_deposit_type');
+            $table->foreignId('branch_id')->constrained('branch');
+            $table->foreignId('linked_account_id')->nullable()->constrained('savings_account');
             $table->decimal('principal_amount', 15, 2);
             $table->enum('interest_freq', ['MONTHLY', 'END']);
             $table->decimal('maturity_amount', 15, 2);
@@ -23,12 +23,8 @@ return new class extends Migration
             $table->enum('status', ['ACTIVE', 'MATURED', 'PREMATURELY_CLOSED']);
             $table->enum('interest_payout_option', ['TRANSFER_TO_SAVINGS', 'RENEW_FD']);
             $table->boolean('auto_renewal')->default(false);
-            $table->timestamp('created_at')->nullable();
             $table->date('closed_date')->nullable();
-            
-            $table->foreign('branch_id')->references('id')->on('branch');
-            $table->foreign('fd_type_id')->references('id')->on('fixed_deposit_type');
-            $table->foreign('customer_id')->references('id')->on('customers');
+            $table->timestamps();
         });
     }
 

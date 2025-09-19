@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('fd_interest_calculations', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
-            $table->bigInteger('account_id');
+            $table->id();
+            $table->foreignId('account_id')->constrained('fixed_deposits');
             $table->date('calculation_period_start');
             $table->date('calculation_period_end');
             $table->decimal('principal_amount', 15, 2);
@@ -20,9 +20,7 @@ return new class extends Migration
             $table->enum('status', ['CALCULATED', 'CREDITED', 'FAILED']);
             $table->timestamp('calculation_date')->nullable();
             $table->timestamp('credited_date')->nullable();
-            $table->integer('transaction_id')->nullable();
-            
-            $table->foreign('account_id')->references('id')->on('fixed_deposits');
+            $table->foreignId('transaction_id')->nullable()->constrained('fd_transaction');
         });
     }
 
