@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class FdInterestCalculation extends Model
 {
     protected $table = 'fd_interest_calculations';
-    public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'account_id',
         'calculation_period_start',
         'calculation_period_end',

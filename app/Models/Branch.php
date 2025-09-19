@@ -7,10 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Branch extends Model
 {
     protected $table = 'branch';
-    public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'branch_code',
         'branch_name',
         'address',
@@ -18,7 +16,6 @@ class Branch extends Model
         'postal_code',
         'phone',
         'manager_id',
-        'created_at',
     ];
 
     protected $casts = [

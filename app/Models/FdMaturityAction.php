@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class FdMaturityAction extends Model
 {
     protected $table = 'fd_maturity_actions';
-    public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'fd_id',
         'maturity_date',
         'action_taken',
@@ -21,7 +19,6 @@ class FdMaturityAction extends Model
         'new_fd_id',
         'transaction_id',
         'processed_date',
-        'created_at',
     ];
 
     protected $casts = [

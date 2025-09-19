@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('status', ['CALCULATED', 'CREDITED', 'FAILED']);
             $table->timestamp('calculation_date')->nullable();
             $table->timestamp('credited_date')->nullable();
+            $table->timestamps();
             $table->foreignId('transaction_id')->nullable()->constrained('fd_transaction');
         });
     }

@@ -10,10 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 class FixedDeposit extends Model
 {
     protected $table = 'fixed_deposits';
-    public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'fd_number',
         'customer_id',
         'fd_type_id',
@@ -27,7 +25,6 @@ class FixedDeposit extends Model
         'status',
         'interest_payout_option',
         'auto_renewal',
-        'created_at',
         'closed_date',
     ];
 

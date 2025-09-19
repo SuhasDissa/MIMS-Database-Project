@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class SavingsAccountInterestCalculation extends Model
 {
     protected $table = 'savings_account_interest_calculations';
-    public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'account_id',
         'calculation_period_start',
         'calculation_period_end',

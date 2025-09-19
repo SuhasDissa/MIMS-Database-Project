@@ -9,10 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 class FdTransaction extends Model
 {
     protected $table = 'fd_transaction';
-    public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'type',
         'method',
         'fd_acc_id',
@@ -20,7 +18,6 @@ class FdTransaction extends Model
         'description',
         'balance_before',
         'balance_after',
-        'created_at',
         'updated_at',
     ];
 

@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class SavingsAccount extends Model
 {
     protected $table = 'savings_account';
-    public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'account_number',
         'account_type_id',
         'branch_id',
@@ -20,7 +18,6 @@ class SavingsAccount extends Model
         'opened_date',
         'closed_date',
         'last_transaction_date',
-        'created_at',
         'last_updated_at',
     ];
 

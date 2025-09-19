@@ -7,17 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class FixedDepositType extends Model
 {
     protected $table = 'fixed_deposit_type';
-    public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'name',
         'min_deposit',
         'interest_rate',
         'tenure_months',
         'description',
         'is_active',
-        'created_at',
     ];
 
     protected $casts = [

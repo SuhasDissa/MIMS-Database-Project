@@ -7,17 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class SavingsAccountType extends Model
 {
     protected $table = 'savings_account_type';
-    public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'name',
         'customer_status_id',
         'min_balance',
         'interest_rate',
         'description',
         'is_active',
-        'created_at',
     ];
 
     protected $casts = [
