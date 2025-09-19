@@ -15,6 +15,15 @@ Route::get('/fd_open', function () {
     return view('FD_open');
 })->name('fd.open');
 
+Route::get('/add_savings_acc_type', function () {
+    return view('add_savings_acc_type');
+})->name('sv.add');
+
+
+Route::get('/add_fd_type', function () {
+    return view('add_fd_type');
+})->name('fd.add');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
