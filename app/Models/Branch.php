@@ -15,7 +15,6 @@ class Branch extends Model
         'city',
         'postal_code',
         'phone',
-        'manager_id',
     ];
 
     protected $casts = [

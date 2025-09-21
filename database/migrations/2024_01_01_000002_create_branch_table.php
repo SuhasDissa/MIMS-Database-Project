@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('city', 50);
             $table->string('postal_code', 5);
             $table->string('phone', 10);
-            $table->integer('manager_id')->nullable();
             $table->timestamps();
         });
     }

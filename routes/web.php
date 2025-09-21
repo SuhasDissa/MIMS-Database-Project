@@ -15,6 +15,14 @@ Route::get('/fd_open', function () {
     return view('FD_open');
 })->name('fd.open');
 
+Route::get('/create_employee', function () {
+    return view('create-employee');
+})->name('create.employee');
+
+Route::get('/create_branch', function () {
+    return view('branch-creation');
+})->name('create.branch');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
