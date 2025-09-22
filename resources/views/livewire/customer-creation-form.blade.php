@@ -4,7 +4,9 @@ use Livewire\Volt\Component;
 use App\Models\Branch;
 
 new class extends Component {
-    
+
+    public $branches = [];
+
     public function mount() {
         // You can fetch branches from the database if needed
         $this->branches = Branch::all()->map(function($branch) {

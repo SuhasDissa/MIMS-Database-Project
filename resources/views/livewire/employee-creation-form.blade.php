@@ -14,6 +14,8 @@ new class extends Component {
     public $branch_id = '';
     public $is_active = true;
 
+    public $branches = [];
+
     protected $rules = [
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
