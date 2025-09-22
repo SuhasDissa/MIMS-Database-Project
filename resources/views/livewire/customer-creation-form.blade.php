@@ -4,9 +4,11 @@ use Livewire\Volt\Component;
 use App\Models\Branch;
 use App\Enums\GenderEnum;
 use App\Models\Customer;
+use App\Models\CustomerStatusType;
 
 new class extends Component {
     public $branches = [];
+    public $statuses = [];
 
     public $first_name = '';
     public $last_name = '';
@@ -18,9 +20,9 @@ new class extends Component {
     public $city = '';
     public $state = '';
     public $postal_code = '';
-    public $id_type = '';
+    public $id_type = 'NIC';
     public $id_number = '';
-    public $status_id = 1; // Default to 'Active'
+    public $status_id = '';
     public $branch_id = '';
 
     public function submit()
@@ -50,10 +52,15 @@ new class extends Component {
 
     public function mount()
     {
-        // You can fetch branches from the database if needed
         $this->branches = Branch::all()
             ->map(function ($branch) {
                 return ['id' => $branch->id, 'name' => $branch->branch_name];
+            })
+            ->toArray();
+
+        $this->statuses = CustomerStatusType::all()
+            ->map(function ($status) {
+                return ['id' => $status->id, 'name' => $status->status_name];
             })
             ->toArray();
     }
@@ -64,7 +71,8 @@ new class extends Component {
         <x-mary-input label="First Name" wire:model="first_name" required class="text-base w-[300px]" />
         <x-mary-input label="Last Name" wire:model="last_name" required class="text-base w-[300px]" />
 
-        <x-mary-input label="Date of Birth" wire:model="dob" type="date" required class="text-base w-[300px]" />
+        <x-mary-input label="Date of Birth" wire:model="date_of_birth" type="date" required
+            class="text-base w-[300px]" />
         <x-mary-select label="Gender" wire:model="gender" :options="GenderEnum::asSelectArray()" required class="text-base" />
 
         <x-mary-input label="Email" wire:model="email" type="email" required class="text-base w-[300px]" />
@@ -72,9 +80,14 @@ new class extends Component {
 
         <x-mary-input label="Address" wire:model="address" required class="text-base w-[300px]" />
         <x-mary-input label="City" wire:model="city" required class="text-base w-[300px]" />
+        <x-mary-input label="State" wire:model="state" required class="text-base w-[300px]" />
 
         <x-mary-input label="Postal Code" wire:model="postal_code" required class="text-base w-[300px]" />
-        <x-mary-input label="NIC Number" wire:model="nic_number" required class="text-base w-[300px]" />
+
+        <x-mary-input label="ID Type" wire:model="id_type" required class="text-base w-[300px]" />
+        <x-mary-input label="NIC Number" wire:model="id_number" required class="text-base w-[300px]" />
+
+        <x-mary-select label="Status" wire:model="status_id" :options="$this->statuses" required class="text-base w-[300px]" />
 
         <x-mary-select label="Branch" wire:model="branch_id" :options="$this->branches" required class="text-base w-[300px]" />
 
@@ -84,7 +97,7 @@ new class extends Component {
     <x-slot:actions>
         <div class="flex justify-center mt-8 w-full">
             <x-mary-button label="Register"
-                class="btn-primary w-full py-6 text-base border-white/50 rounded-lg shadow-md bg-transparent transition-all duration-200 hover:border-white/100 hover:bg-white  hover:text-black font-semibold"
+                class="btn-primary w-full py-6 text-primary dark:text-base border-white/50 rounded-lg shadow-md bg-transparent transition-all duration-200 hover:border-white/100 hover:bg-white  hover:text-black font-semibold"
                 type="submit" />
         </div>
     </x-slot:actions>

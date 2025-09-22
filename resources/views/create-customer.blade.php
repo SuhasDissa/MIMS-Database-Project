@@ -5,7 +5,7 @@
                 </div>
                 <div class="p-6 w-[50%] flex items-center justify-center flex-col">
                     <!-- Title -->
-                    <h2 class="text-4xl font-bold text-white-800 mb-10 text-center">
+                    <h2 class="text-4xl font-bold text-base-content mb-10 text-center">
                         Customer Registration
                     </h2>
 

@@ -3,7 +3,7 @@
     <head>
         @include('partials.head')
     </head>
-    <body class=" bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900 m-0 p-0">
+    <body class=" bg-base antialiased m-0 p-0">
                     {{ $slot }}
 
     </body>
