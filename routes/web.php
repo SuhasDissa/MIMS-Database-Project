@@ -7,20 +7,20 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('/reg_cus', function () {
-    return view('Customer_registration');
-})->name('customer.register');
+Route::get('/create_customer', function () {
+    return view('create-customer');
+})->name('create.customer');
 
-Route::get('/fd_open', function () {
-    return view('FD_open');
-})->name('fd.open');
+Route::get('/create_fd', function () {
+    return view('create-fd');
+})->name('create.fd');
 
 Route::get('/create_employee', function () {
     return view('create-employee');
 })->name('create.employee');
 
 Route::get('/create_branch', function () {
-    return view('branch-creation');
+    return view('create-branch');
 })->name('create.branch');
 
 Route::view('dashboard', 'dashboard')
