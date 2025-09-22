@@ -21,4 +21,9 @@ enum GenderEnum: string
     {
         return array_column(self::cases(), 'value');
     }
+
+    public static function asSelectArray(): array
+    {
+        return array_map(fn($case) => ['id' => $case->value, 'name' => $case->label()], self::cases());
+    }
 }
