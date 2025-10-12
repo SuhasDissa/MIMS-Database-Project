@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('branch_name', 50);
             $table->string('address', 100);
             $table->string('city', 50);
-            $table->string('postal_code', 5);
+            $table->string('postal_code', 20);
             $table->string('phone', 10);
             $table->timestamps();
         });

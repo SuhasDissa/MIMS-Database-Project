@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('savings_accounts_customers', function (Blueprint $table) {
-            $table->bigInteger('sav_acc_id');
-            $table->bigInteger('customer_id');
+            $table->foreignId('sav_acc_id')->constrained('savings_account');
+            $table->foreignId('customer_id')->constrained('customers');
             
-            $table->foreign('sav_acc_id')->references('id')->on('savings_account');
-            $table->foreign('customer_id')->references('id')->on('customers');
+            //$table->foreign('sav_acc_id')->references('id')->on('savings_account');
+            //$table->foreign('customer_id')->references('id')->on('customers');
             
             $table->primary(['sav_acc_id', 'customer_id']);
         });
