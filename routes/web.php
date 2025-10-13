@@ -4,8 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard.home');
 })->name('home');
+
+Route::get('/dashboard-home', function () {
+    return view('dashboard-home');
+})->name('dashboard.home');
 
 Route::get('/create_customer', function () {
     return view('create-customer');
@@ -27,10 +31,18 @@ Route::get('/add_savings_acc_type', function () {
     return view('add_savings_acc_type');
 })->name('sv.add');
 
+Route::get('/add_savings_acc_type', function () {
+    return view('add_savings_acc_type');
+})->name('sv.add');
+
 
 Route::get('/add_fd_type', function () {
     return view('add_fd_type');
 })->name('fd.add');
+
+Route::get('/create_transaction', function () {
+    return view('create-transaction');
+})->name('create.transaction');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
