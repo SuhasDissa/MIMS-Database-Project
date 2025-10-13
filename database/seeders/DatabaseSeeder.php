@@ -4,9 +4,12 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Branch;
+use App\Models\Customer;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\CustomerStatusTypesSeeder;
+use Database\Seeders\SavingsAccountTypesSeeder;
 
 
 
@@ -17,11 +20,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        //1
+        $this->call(CustomerStatusTypesSeeder::class);
+        //2
         Branch::factory(10)->create();
+        //3
+        $this->call(SavingsAccountTypesSeeder::class);
+        //4
+        Customer::factory(10)->create();
 
             // User::factory()->create([
             //     'name' => 'Test User',
             //     'email' => 'test@example.com',
             // ]);
+
     }
 }
