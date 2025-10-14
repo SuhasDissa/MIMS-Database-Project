@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Enums\AccountStatusEnum;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SavingsAccount extends Model
 {
+
+    use HasFactory;
     protected $table = 'savings_account';
 
     protected $fillable = [
