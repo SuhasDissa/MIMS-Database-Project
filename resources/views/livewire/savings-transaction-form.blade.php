@@ -16,9 +16,9 @@
     </div>
 
     <x-slot:actions>
-        <div class="mt-6 w-full">
+        <div class="mt-6 w-full flex justify-end">
             <x-mary-button label="Proceed Transaction"
-            class="btn-primary w-full py-6 text-base border-white/50 rounded-lg shadow-md bg-transparent transition-all duration-200 hover:border-white/100 hover:bg-white  hover:text-black font-semibold"/>
+            class="btn-primary"/>
         </div>
     </x-slot:actions>
 </x-mary-form>

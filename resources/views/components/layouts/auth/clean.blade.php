@@ -6,6 +6,6 @@
     <body class=" bg-base antialiased m-0 p-0">
                     {{ $slot }}
 
-        <x-mary-toast />
+                    <x-mary-toast />
     </body>
 </html>

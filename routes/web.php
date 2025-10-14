@@ -4,12 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    return redirect()->route('dashboard.home');
+    return view('welcome');
 })->name('home');
-
-Route::get('/dashboard-home', function () {
-    return view('dashboard-home');
-})->name('dashboard.home');
 
 Route::get('/create_customer', function () {
     return view('create-customer');

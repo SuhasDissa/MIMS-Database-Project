@@ -1,17 +1,10 @@
-<x-layouts.auth.clean>
-    <div class=" flex h-[100dvh] w-[100%] items-center justify-center m-0 p-0">
-                <div class="w-[50%] h-full flex items-start justify-center">
-                    <img src="{{ asset('bank2.jpg') }}" alt="Customer Registration" class="w-full h-full">
-                </div>
-                <div class="p-6 w-[50%] flex items-center justify-center flex-col">
-                    <!-- Title -->
-                    <h2 class="text-4xl font-bold text-white-800 mb-10 text-center">
-                        Add Savings Account Type
-                    </h2>
+<x-layouts.app>
+    <div class="max-w-7xl mx-auto">
+        <x-mary-header title="Add Savings Account Type" subtitle="Configure a new savings account type" separator />
 
+        <x-mary-card class="mt-6">
                     <!-- Form -->
                     <livewire:savings-acc-type-form />
-
-                </div>
-            </div>
-</x-layouts.auth.clean>
+        </x-mary-card>
+    </div>
+</x-layouts.app>

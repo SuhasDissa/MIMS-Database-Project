@@ -58,10 +58,10 @@ new class extends Component {
 
     <!-- Button -->
     <x-slot:actions>
-        <div class="flex justify-center mt-8 w-full">
+        <div class="flex justify-end mt-8 w-full">
             <x-mary-button 
-                label="Register" 
-                class="btn-primary w-full py-6 text-base border-white/50 rounded-lg shadow-md bg-transparent transition-all duration-200 hover:border-white/100 hover:bg-white  hover:text-black font-semibold" 
+                label="Create Branch" 
+                class="btn-primary" 
                 type="submit" />
         </div>
     </x-slot:actions>
