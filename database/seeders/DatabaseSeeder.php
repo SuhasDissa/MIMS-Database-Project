@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\CustomerStatusType;
 use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\SavingsAccount;
@@ -36,6 +37,14 @@ class DatabaseSeeder extends Seeder
             //     'name' => 'Test User',
             //     'email' => 'test@example.com',
             // ]);
+
+        // User::factory(10)->create();
+        CustomerStatusType::factory()->createMany([
+            ['status_name' => 'Adult', 'description' => 'Adult Customer', 'min_age' => 18, 'max_age' => 60],
+            ['status_name' => 'Senior', 'description' => 'Senior Customer', 'min_age' => 60, 'max_age' => 180],
+            ['status_name' => 'Junior', 'description' => 'Junior Customer', 'min_age' => 0, 'max_age' => 18],
+       ]);
+
 
     }
 }
