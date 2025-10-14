@@ -27,14 +27,35 @@ Route::get('/add_savings_acc_type', function () {
     return view('add_savings_acc_type');
 })->name('sv.add');
 
-
 Route::get('/add_fd_type', function () {
     return view('add_fd_type');
 })->name('fd.add');
 
+
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+
+// Saving account Transactions
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/saving_transfer', function () {
+        return view('transaction/savings_transfer');
+    })->name('sv.trans');
+
+    Route::get('/saving_deposit', function () {
+        return view('transaction/savings_deposit');
+    })->name('sv.dep');
+
+    Route::get('/saving_withdraw', function () {
+        return view('transaction/savings_withdraw');
+    })->name('sv.wit');
+    
+});
+
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

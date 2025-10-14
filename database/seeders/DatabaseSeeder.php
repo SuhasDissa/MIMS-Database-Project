@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\SavingsAccount;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -28,6 +29,8 @@ class DatabaseSeeder extends Seeder
         $this->call(SavingsAccountTypesSeeder::class);
         //4
         Customer::factory(10)->create();
+        //5
+        SavingsAccount::factory(5)->create();
 
             // User::factory()->create([
             //     'name' => 'Test User',
