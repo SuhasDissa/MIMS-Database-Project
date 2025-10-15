@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Enums\CustomerStatusEnum;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CustomerStatusType extends Model
 {
+    use HasFactory;
     protected $table = 'customer_status_types';
 
     protected $fillable = [

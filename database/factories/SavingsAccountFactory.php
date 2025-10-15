@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Branch;
+use App\Models\Customer;
+use App\Models\SavingsAccountType;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\SavingsAccount;
-
-
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Customer>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SavingsAccount>
  */
 class SavingsAccountFactory extends Factory
 {
@@ -17,20 +17,61 @@ class SavingsAccountFactory extends Factory
      *
      * @return array<string, mixed>
      */
-
-    protected $model = SavingsAccount::class;
-
     public function definition(): array
     {
+        $openedDate = $this->faker->dateTimeBetween('-5 years', 'now');
+
         return [
-            'account_number' => 'SA-' . strtoupper(\Illuminate\Support\Str::random(8)),
-            'account_type_id' => $this->faker->numberBetween(1, 3), // assumes you have 3 account types
-            'branch_id' => $this->faker->numberBetween(1, 5), // assumes 5 branches
-            'balance' => $this->faker->randomFloat(2, 1000, 50000),
+            'account_number' => $this->faker->unique()->numerify('SA##########'),
+            'account_type_id' => $this->faker->numberBetween(1, 3), // Student, Regular, Senior, Premium Savings
+            'branch_id' => $this->faker->numberBetween(1, 10), // Use existing branches 1-10
+            'balance' => $this->faker->randomFloat(2, 0, 100000),
             'status' => $this->faker->randomElement(['ACTIVE', 'INACTIVE']),
-            'opened_date' => $this->faker->dateTimeBetween('-2 years', 'now'),
-            'closed_date' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
-            'last_transaction_date' => $this->faker->optional()->dateTimeBetween('-6 months', 'now'),
+            'opened_date' => $openedDate,
+            'closed_date' => null,
+            'last_transaction_date' => $this->faker->dateTimeBetween($openedDate, 'now'),
         ];
+    }
+
+    /**
+     * Indicate that the account is inactive/closed.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'INACTIVE',
+            'closed_date' => $this->faker->dateTimeBetween($attributes['opened_date'], 'now'),
+            'balance' => 0,
+        ]);
+    }
+
+    /**
+     * Indicate that the account is active.
+     */
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'ACTIVE',
+            'closed_date' => null,
+        ]);
+    }
+
+    /**
+     * Configure the model factory.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function ($savingsAccount) {
+            // Attach 1-3 random customers to the savings account
+            $customerCount = $this->faker->numberBetween(1, 2);
+            $customers = Customer::inRandomOrder()->limit($customerCount)->get();
+
+            if ($customers->isEmpty()) {
+                // If no customers exist, create them
+                $customers = Customer::factory($customerCount)->create();
+            }
+
+            $savingsAccount->customers()->attach($customers->pluck('id'));
+        });
     }
 }

@@ -18,7 +18,7 @@ class BranchFactory extends Factory
     {
         return [
             'branch_code' => strtoupper($this->faker->bothify('BR###')),
-            'branch_name' => $this->faker->company(),
+            'branch_name' => $this->faker->city() . ' Branch',
             'address' => $this->faker->address(),
             'city' => $this->faker->city(),
             'postal_code' => $this->faker->postcode(),
