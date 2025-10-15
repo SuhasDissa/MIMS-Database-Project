@@ -15,6 +15,10 @@ Route::get('/create_fd', function () {
     return view('create-fd');
 })->name('create.fd');
 
+Route::get('/create_savings_account', function () {
+    return view('create-savings-account');
+})->name('create.savings.account');
+
 Route::get('/create_employee', function () {
     return view('create-employee');
 })->name('create.employee');
@@ -47,6 +51,14 @@ Route::get('/account/{account}', function (\App\Models\SavingsAccount $account) 
 Route::get('/interest_reports', function () {
     return view('interest-reports');
 })->name('reports.interest');
+
+Route::get('/view_customers', function () {
+    return view('view-customers');
+})->name('customers.view');
+
+Route::get('/view_employees', function () {
+    return view('view-employees');
+})->name('employees.view');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
