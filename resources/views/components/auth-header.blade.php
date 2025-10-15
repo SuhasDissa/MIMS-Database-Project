@@ -1,6 +1,6 @@
 @props([
-    'heading',
-    'description',
+    'heading' => '',
+    'description' => '',
 ])
 
 <div class="flex w-full flex-col text-center">
