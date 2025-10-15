@@ -44,6 +44,14 @@ Route::get('/view_accounts', function () {
     return view('view-accounts');
 })->name('accounts.view');
 
+Route::get('/view_customers', function () {
+    return view('view-customers');
+})->name('customers.view');
+
+Route::get('/view_employees', function () {
+    return view('view-employees');
+})->name('employees.view');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');

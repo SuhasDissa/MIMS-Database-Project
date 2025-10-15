@@ -45,4 +45,9 @@ class Customer extends Model
     {
         return $this->hasMany(FixedDeposit::class, 'customer_id');
     }
+
+    public function status()
+    {
+        return $this->belongsTo(CustomerStatusType::class, 'status_id');
+    }
 }

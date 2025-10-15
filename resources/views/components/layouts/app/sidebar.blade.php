@@ -38,7 +38,7 @@
 
                     <x-mary-menu-sub title="Customer Management" icon="o-users">
                         <x-mary-menu-item title="Create Customer" icon="o-user-plus" link="{{ route('create.customer') }}" />
-                        <x-mary-menu-item title="View Customers" icon="o-user-group" link="#" />
+                        <x-mary-menu-item title="View Customers" icon="o-user-group" link="{{ route('customers.view') }}" />
                     </x-mary-menu-sub>
 
                     <x-mary-menu-sub title="Accounts" icon="o-credit-card">
@@ -66,7 +66,7 @@
 
                     <x-mary-menu-sub title="Employee Management" icon="o-identification">
                         <x-mary-menu-item title="Create Employee" icon="o-user-plus" link="{{ route('create.employee') }}" />
-                        <x-mary-menu-item title="View Employees" icon="o-user-group" link="#" />
+                        <x-mary-menu-item title="View Employees" icon="o-user-group" link="{{ route('employees.view') }}" />
                     </x-mary-menu-sub>
 
                     <x-mary-menu-separator />
