@@ -21,17 +21,13 @@ class SavingsAccount extends Model
         'opened_date',
         'closed_date',
         'last_transaction_date',
-        'last_updated_at',
     ];
 
     protected $casts = [
         'balance' => 'decimal:2',
-        'status' => AccountStatusEnum::class,
         'opened_date' => 'date',
         'closed_date' => 'date',
         'last_transaction_date' => 'date',
-        'created_at' => 'datetime',
-        'last_updated_at' => 'datetime',
     ];
 
     public function accountType()
