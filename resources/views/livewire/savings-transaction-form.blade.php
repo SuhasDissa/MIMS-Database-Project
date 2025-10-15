@@ -7,10 +7,10 @@
         @endif
 
         @if ($type === 'DEPOSIT' || $type === 'TRANSFER')
-            <x-mary-select label="To Account" wire:model="to_id" :options="$accounts" option-value="id" option-label="name" class="text-base w-[300px]" />
+            <x-mary-input label="To Account" wire:model="to_id" type="number" min="0" class="text-base w-[300px]" />
         @endif
 
-        <x-mary-input label="Amount" wire:model="amount" type="number" min="0" class="text-base w-[300px]" />
+        <x-mary-input label="Amount (Rs.)" wire:model="amount" type="number" min="0" class="text-base w-[300px]" />
 
         <x-mary-textarea label="Description" wire:model="description" rows="3" class="text-base w-[300px]" />
     </div>

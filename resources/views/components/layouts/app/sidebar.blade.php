@@ -42,7 +42,7 @@
                     </x-mary-menu-sub>
 
                     <x-mary-menu-sub title="Accounts" icon="o-credit-card">
-                        <x-mary-menu-item title="Create Savings Account" icon="o-plus-circle" link="#" />
+                        <x-mary-menu-item title="Create Savings Account" icon="o-plus-circle" link="{{ route('create.savings-acc') }}" />
                         <x-mary-menu-item title="Create Fixed Deposit" icon="o-banknotes" link="{{ route('create.fd') }}" />
                         <x-mary-menu-item title="View Accounts" icon="o-list-bullet" link="#" />
                     </x-mary-menu-sub>

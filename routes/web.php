@@ -23,6 +23,10 @@ Route::get('/create_branch', function () {
     return view('create-branch');
 })->name('create.branch');
 
+Route::get('/create_savings_acc', function () {
+    return view('create-savings-acc');
+})->name('create.savings-acc');
+
 Route::get('/add_savings_acc_type', function () {
     return view('add_savings_acc_type');
 })->name('sv.add');

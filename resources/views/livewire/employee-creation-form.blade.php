@@ -62,10 +62,7 @@ new class extends Component {
         <x-mary-input label="Position" wire:model="position" required class="text-base w-[300px]" />
         <x-mary-input label="NIC Number" wire:model="nic_num" required class="text-base w-[300px]" />
         <x-mary-select label="Branch" wire:model="branch_id" required class="text-base w-[300px]" :options="$this->branches" />
-        <x-mary-select label="Active" wire:model="is_active" required class="text-base w-[300px]" :options="[
-            ['id' => true, 'name' => 'Active'],
-            ['id' => false, 'name' => 'Inactive'],
-        ]" />
+
     </div>
 
     <!-- Button -->

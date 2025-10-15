@@ -91,10 +91,10 @@
                     class="btn-primary" />
 
                 <x-mary-button
-                    label="Create Branch"
-                    icon="o-building-office"
-                    link="{{ route('create.branch') }}"
-                    class="btn-secondary" />
+                    label="Create Savings Acc"
+                    icon="o-credit-card"
+                    link="{{ route('create.savings-acc') }}"
+                    class="btn-warning" />
 
                 <x-mary-button
                     label="Create FD"
@@ -103,10 +103,11 @@
                     class="btn-accent" />
 
                 <x-mary-button
-                    label="Create Employee"
-                    icon="o-identification"
-                    link="{{ route('create.employee') }}"
+                    label="New Transaction"
+                    icon="o-plus-circle"
+                    link="{{ route('create.transaction') }}"
                     class="btn-info" />
+
             </div>
         </x-mary-card>
 

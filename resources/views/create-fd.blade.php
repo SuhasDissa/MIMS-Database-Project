@@ -19,23 +19,12 @@
                     <!-- Linked Account ID (Savings Account Number) -->
                     <x-mary-input label="Linked Account ID" wire:model="linked_account_id" required />
 
-                    <!-- Interest Frequency in Months (Select) -->
-                    <x-mary-select label="Interest Frequency (Months)" wire:model="interest_frequency"
-                        :options="['fixed' => 'Fixed', 'recurring' => 'Recurring']"
+                    <!-- Amount (Select) -->
+                    <x-mary-input label="Amount (LKR)" wire:model="interest_frequency" type="number"
+                        
                         required />
 
-                    <!-- Maturity Number (Optional) -->
-                    <x-mary-input label="Maturity Number (Months)" wire:model="maturity_number" />
-
-                    <!-- Interest Payout (Select) -->
-                    <x-mary-select label="Interest Payout" wire:model="interest_payout"
-                        :options="['fixed' => 'Fixed', 'recurring' => 'Recurring']"
-                        required />
-
-                    <!-- Auto Renewal (Select) -->
-                    <x-mary-select label="Auto Renewal" wire:model="auto_renewal"
-                        :options="['fixed' => 'Fixed', 'recurring' => 'Recurring']"
-                        required />
+                    
                 </div>
 
                 <!-- Button -->
@@ -44,7 +33,7 @@
                         label="Create Fixed Deposit"
                         class="btn-primary"
                         type="submit"
-                        spinner="save2" />
+                        {{-- spinner="save2" /> --}} />
                 </x-slot:actions>
             </x-mary-form>
         </x-mary-card>
