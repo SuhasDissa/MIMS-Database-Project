@@ -15,6 +15,10 @@ Route::get('/create_fd', function () {
     return view('create-fd');
 })->name('create.fd');
 
+Route::get('/create_savings_account', function () {
+    return view('create-savings-account');
+})->name('create.savings.account');
+
 Route::get('/create_employee', function () {
     return view('create-employee');
 })->name('create.employee');
