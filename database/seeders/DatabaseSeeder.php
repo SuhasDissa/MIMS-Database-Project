@@ -22,29 +22,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //1
+        // Required seeders
         $this->call(CustomerStatusTypesSeeder::class);
-        //2
-        Branch::factory(10)->create();
-        //3
         $this->call(SavingsAccountTypesSeeder::class);
-        //4
-        Customer::factory(10)->create();
-        //5
-        SavingsAccount::factory(5)->create();
 
-            // User::factory()->create([
-            //     'name' => 'Test User',
-            //     'email' => 'test@example.com',
-            // ]);
+        // Create test user
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@test.com',
+            'password' => bcrypt('demo'),
+        ]);
 
-        // User::factory(10)->create();
-        CustomerStatusType::factory()->createMany([
-            ['status_name' => 'Adult', 'description' => 'Adult Customer', 'min_age' => 18, 'max_age' => 60],
-            ['status_name' => 'Senior', 'description' => 'Senior Customer', 'min_age' => 60, 'max_age' => 180],
-            ['status_name' => 'Junior', 'description' => 'Junior Customer', 'min_age' => 0, 'max_age' => 18],
-       ]);
-
-
+        // Testing only seeders
+        Branch::factory(10)->create();
+        Customer::factory(100)->create();
+        SavingsAccount::factory(500)->create();
     }
 }
