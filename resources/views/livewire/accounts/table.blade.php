@@ -89,7 +89,9 @@ new class extends Component {
                 ['key' => 'opened_date', 'label' => 'Opened Date', 'class' => 'font-semibold'],
             ]" :rows="$accounts">
                 @scope('cell_account_number', $account)
-                    <span class="text-primary font-mono">{{ $account->account_number }}</span>
+                    <a href="{{ route('accounts.details', $account->id) }}" class="text-primary font-mono hover:underline">
+                        {{ $account->account_number }}
+                    </a>
                 @endscope
 
                 @scope('cell_customers', $account)

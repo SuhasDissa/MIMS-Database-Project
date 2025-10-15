@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('interest_amount', 15, 2);
             $table->enum('status', ['CALCULATED', 'CREDITED', 'FAILED']);
             $table->timestamp('calculation_date')->nullable();
+            $table->timestamp('credited_date')->nullable();
             $table->foreignId('transaction_id')->nullable()->constrained('savings_transaction');
             $table->timestamps();
         });

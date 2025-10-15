@@ -25,7 +25,7 @@ class SavingsAccountFactory extends Factory
             'account_number' => $this->faker->unique()->numerify('SA##########'),
             'account_type_id' => $this->faker->numberBetween(1, 3), // Student, Regular, Senior, Premium Savings
             'branch_id' => $this->faker->numberBetween(1, 10), // Use existing branches 1-10
-            'balance' => $this->faker->randomFloat(2, 0, 100000),
+            'balance' => 0,
             'status' => $this->faker->randomElement(['ACTIVE', 'INACTIVE']),
             'opened_date' => $openedDate,
             'closed_date' => null,
