@@ -36,6 +36,10 @@ Route::get('/create_transaction', function () {
     return view('create-transaction');
 })->name('create.transaction');
 
+Route::get('/view_accounts', function () {
+    return view('view-accounts');
+})->name('accounts.view');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
