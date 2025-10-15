@@ -37,5 +37,8 @@ class DatabaseSeeder extends Seeder
         Branch::factory(10)->create();
         Customer::factory(100)->create();
         SavingsAccount::factory(500)->create();
+
+        $this->call(SavingsTransactionsSeeder::class);
+        $this->call(SavingsAccountInterestCalculationsSeeder::class);
     }
 }

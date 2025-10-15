@@ -40,6 +40,14 @@ Route::get('/view_accounts', function () {
     return view('view-accounts');
 })->name('accounts.view');
 
+Route::get('/account/{account}', function (\App\Models\SavingsAccount $account) {
+    return view('account-details', ['account' => $account]);
+})->name('accounts.details');
+
+Route::get('/interest_reports', function () {
+    return view('interest-reports');
+})->name('reports.interest');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
