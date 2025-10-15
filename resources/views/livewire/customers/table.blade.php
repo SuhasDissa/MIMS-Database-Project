@@ -109,12 +109,12 @@ new class extends Component {
                 @endscope
 
                 @scope('cell_status', $customer)
-                    @if($customer->status->name === 'Active')
-                        <span class="badge badge-success badge-soft">{{ $customer->status->name }}</span>
-                    @elseif($customer->status->name === 'Inactive')
-                        <span class="badge badge-warning badge-soft">{{ $customer->status->name }}</span>
+                    @if($customer->status->status_name === 'ADULT')
+                        <span class="badge badge-success badge-soft">{{ $customer->status->status_name }}</span>
+                    @elseif($customer->status->status_name === 'SENIOR')
+                        <span class="badge badge-warning badge-soft">{{ $customer->status->status_name }}</span>
                     @else
-                        <span class="badge badge-error badge-soft">{{ $customer->status->name }}</span>
+                        <span class="badge badge-error badge-soft">{{ $customer->status->status_name }}</span>
                     @endif
                 @endscope
 

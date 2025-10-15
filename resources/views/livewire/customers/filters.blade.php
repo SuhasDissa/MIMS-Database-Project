@@ -22,7 +22,7 @@ new class extends Component {
         })->toArray();
 
         $statuses = CustomerStatusType::all()->map(function ($status) {
-            return ['id' => $status->id, 'name' => $status->name];
+            return ['id' => $status->id, 'name' => $status->status_name];
         })->toArray();
 
         return [

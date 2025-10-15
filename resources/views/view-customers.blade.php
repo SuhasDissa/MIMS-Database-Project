@@ -1,5 +1,6 @@
 @php
     use App\Models\Customer;
+    use App\Models\SavingsAccount;
 @endphp
 
 <x-layouts.app>
@@ -27,15 +28,22 @@
                 class="bg-base-100 shadow-md" />
 
             <x-mary-stat
-                title="Active Customers"
-                :value="Customer::where('status_id', 1)->count()" {{-- Assuming 1 is active --}}
+                title="Senior Customers"
+                :value="Customer::where('status_id', 2)->count()" {{-- Assuming 2 is senior --}}
+                icon="o-check-circle"
+                color="text-success"
+                class="bg-base-100 shadow-md" />
+
+            <x-mary-stat
+                title="Junior Customers"
+                :value="Customer::where('status_id', 1)->count()" {{-- Assuming 1 is junior --}}
                 icon="o-check-circle"
                 color="text-success"
                 class="bg-base-100 shadow-md" />
 
             <x-mary-stat
                 title="Total Savings Accounts"
-                :value="Customer::with('savingsAccounts')->get()->sum(fn($c) => $c->savingsAccounts->count())"
+                :value="SavingsAccount::count()"
                 icon="o-credit-card"
                 color="text-accent"
                 class="bg-base-100 shadow-md" />

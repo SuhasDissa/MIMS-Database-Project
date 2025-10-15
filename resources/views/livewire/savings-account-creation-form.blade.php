@@ -73,7 +73,7 @@ new class extends Component {
 
         $this->dispatch('toast', title: 'Savings account created successfully.');
 
-        $this->reset();
+        $this->reset(['account_number', 'account_type_id', 'branch_id', 'balance', 'status', 'opened_date', 'customer_ids']);
     }
 }; ?>
 
