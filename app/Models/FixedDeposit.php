@@ -56,6 +56,11 @@ class FixedDeposit extends Model
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
+    public function linkedSavingsAccount()
+    {
+        return $this->belongsTo(SavingsAccount::class, 'linked_account_id');
+    }
+
     public function transactions()
     {
         return $this->hasMany(FdTransaction::class, 'fd_acc_id');
