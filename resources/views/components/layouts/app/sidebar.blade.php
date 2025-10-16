@@ -49,7 +49,7 @@
 
                     <x-mary-menu-sub title="Transactions" icon="o-currency-dollar">
                         <x-mary-menu-item title="New Transaction" icon="o-arrow-path" link="{{ route('create.transaction') }}" />
-                        <x-mary-menu-item title="Transaction History" icon="o-clock" link="#" />
+                        <x-mary-menu-item title="Transaction History" icon="o-clock" link="{{ route('transactions.view') }}" />
                     </x-mary-menu-sub>
 
                     <x-mary-menu-sub title="Configuration" icon="o-cog-6-tooth">

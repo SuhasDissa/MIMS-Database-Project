@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Employee;
 use App\Models\User;
 use App\Models\CustomerStatusType;
 use App\Models\Branch;
@@ -37,6 +38,7 @@ class DatabaseSeeder extends Seeder
         Branch::factory(10)->create();
         Customer::factory(100)->create();
         SavingsAccount::factory(500)->create();
+        Employee::factory(20)->create();
 
         $this->call(SavingsTransactionsSeeder::class);
         $this->call(SavingsAccountInterestCalculationsSeeder::class);
