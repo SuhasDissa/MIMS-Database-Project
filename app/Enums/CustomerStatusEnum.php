@@ -5,15 +5,17 @@ namespace App\Enums;
 enum CustomerStatusEnum: string
 {
     case CHILD = 'CHILD';
-    case SENIOR = 'SENIOR';
+    case TEEN = 'TEEN';
     case ADULT = 'ADULT';
+    case SENIOR = 'SENIOR';
 
     public function label(): string
     {
         return match($this) {
             self::CHILD => 'Child',
-            self::SENIOR => 'Senior',
+            self::TEEN => 'Teen',
             self::ADULT => 'Adult',
+            self::SENIOR => 'Senior',
         };
     }
 
