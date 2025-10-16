@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('customer_status_types', function (Blueprint $table) {
             $table->id();
-            $table->enum('status_name', ['CHILD', 'SENIOR', 'ADULT']);
+            $table->enum('status_name', ['CHILD', 'TEEN', 'ADULT', 'SENIOR']);
             $table->string('description', 256)->nullable();
             $table->integer('min_age')->nullable();
             $table->integer('max_age')->nullable();

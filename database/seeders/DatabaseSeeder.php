@@ -12,6 +12,7 @@ use App\Models\SavingsAccount;
 use Illuminate\Database\Seeder;
 use Database\Seeders\CustomerStatusTypesSeeder;
 use Database\Seeders\SavingsAccountTypesSeeder;
+use Database\Seeders\FixedDepositTypesSeeder;
 
 
 
@@ -25,6 +26,7 @@ class DatabaseSeeder extends Seeder
         // Required seeders
         $this->call(CustomerStatusTypesSeeder::class);
         $this->call(SavingsAccountTypesSeeder::class);
+        $this->call(FixedDepositTypesSeeder::class);
 
         // Create test user
         User::factory()->create([

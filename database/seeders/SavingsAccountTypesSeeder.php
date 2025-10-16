@@ -11,27 +11,43 @@ class SavingsAccountTypesSeeder extends Seeder
     {
         $accountTypes = [
             [
-                'name' => 'Student Savings',
-                'customer_status_id' => 1, // CHILD
+                'name' => 'Children',
+                'customer_status_id' => 1, // CHILD (0-11 years)
                 'min_balance' => 0.00,
-                'interest_rate' => 0.0200,
-                'description' => 'Savings account for customers under 18 years with no minimum balance requirement',
+                'interest_rate' => 0.12, // 12% interest
+                'description' => 'Savings account for children aged 0-11 years with no minimum balance requirement',
                 'is_active' => true,
             ],
             [
-                'name' => 'Regular Savings',
-                'customer_status_id' => 2, // ADULT
-                'min_balance' => 1000.00,
-                'interest_rate' => 0.0350,
-                'description' => 'Standard savings account for adult customers with competitive interest rates',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Senior Savings',
-                'customer_status_id' => 3, // SENIOR
+                'name' => 'Teen',
+                'customer_status_id' => 2, // TEEN (12-17 years)
                 'min_balance' => 500.00,
-                'interest_rate' => 0.0450,
-                'description' => 'Premium savings account for senior citizens with higher interest rates and lower minimum balance',
+                'interest_rate' => 0.11, // 11% interest, minimum LKR 500
+                'description' => 'Savings account for teens aged 12-17 years with minimum balance of LKR 500',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Adult',
+                'customer_status_id' => 3, // ADULT (18-59 years)
+                'min_balance' => 1000.00,
+                'interest_rate' => 0.10, // 10% interest, minimum LKR 1000
+                'description' => 'Standard savings account for adult customers aged 18+ with minimum balance of LKR 1000',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Senior',
+                'customer_status_id' => 4, // SENIOR (60+ years)
+                'min_balance' => 1000.00,
+                'interest_rate' => 0.13, // 13% interest, minimum LKR 1000
+                'description' => 'Premium savings account for senior citizens aged 60+ with higher interest rates',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Joint',
+                'customer_status_id' => null, // No specific age restriction for joint accounts
+                'min_balance' => 5000.00,
+                'interest_rate' => 0.07, // 7% interest, minimum LKR 5000
+                'description' => 'Joint savings account for multiple account holders with minimum balance of LKR 5000',
                 'is_active' => true,
             ],
         ];

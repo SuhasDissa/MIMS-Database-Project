@@ -12,8 +12,14 @@ class CustomerStatusTypesSeeder extends Seeder
         $statusTypes = [
             [
                 'status_name' => 'CHILD',
-                'description' => 'Customers under 18 years old - eligible for student accounts with no minimum balance',
+                'description' => 'Children customers aged 0-11 years - eligible for children accounts with no minimum balance',
                 'min_age' => 0,
+                'max_age' => 11,
+            ],
+            [
+                'status_name' => 'TEEN',
+                'description' => 'Teen customers aged 12-17 years - eligible for teen accounts with minimum balance requirement',
+                'min_age' => 12,
                 'max_age' => 17,
             ],
             [
