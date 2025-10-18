@@ -60,6 +60,10 @@ Route::get('/view_employees', function () {
     return view('view-employees');
 })->name('employees.view');
 
+Route::get('/view_transactions', function () {
+    return view('view-transactions');
+})->name('transactions.view');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
