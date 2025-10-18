@@ -25,9 +25,26 @@ new class extends Component {
     public $status_id = '';
     public $branch_id = '';
 
+//     protected $rules = [
+//         'first_name' => 'required|string|max:255',
+//         'last_name' => 'required|string|max:255',
+//         'date_of_birth' => 'required|date',
+//         'gender' => 'required|string',
+//         'email' => 'required|email|max:255|unique:customers,email',
+//         'phone' => 'required|string|max:20',
+//         'address' => 'required|string|max:255',
+//         'city' => 'required|string|max:255',
+//         'state' => 'required|string|max:255',
+//         'postal_code' => 'required|string|max:10',
+//         'id_type' => 'required|string|max:20',
+//         'id_number' => 'required|string|max:50|unique:customers,id_number',
+//         'status_id' => 'required|exists:customer_status_types,id',
+//         'branch_id' => 'required|exists:branches,id',
+// ];
+
     public function submit()
     {
-        $this->validate();
+        // $this->validate();
 
         $data = [
             'first_name' => $this->first_name,
@@ -73,7 +90,13 @@ new class extends Component {
 
         <x-mary-input label="Date of Birth" wire:model="date_of_birth" type="date" required
             class="text-base w-[300px]" />
-        <x-mary-select label="Gender" wire:model="gender" :options="GenderEnum::asSelectArray()" required class="text-base" />
+        <x-mary-select label="Gender" wire:model="gender" placeholder="Select a gender"
+        :options="[
+        ['id' => 'M', 'name' => 'Male'],
+        ['id' => 'F', 'name' => 'Female'],
+        ['id' => 'O', 'name' => 'Other']
+    ]" 
+        required class="text-base" />
 
         <x-mary-input label="Email" wire:model="email" type="email" required class="text-base w-[300px]" />
         <x-mary-input label="Phone" wire:model="phone" required class="text-base w-[300px]" />
@@ -87,17 +110,17 @@ new class extends Component {
         <x-mary-input label="ID Type" wire:model="id_type" required class="text-base w-[300px]" />
         <x-mary-input label="NIC Number" wire:model="id_number" required class="text-base w-[300px]" />
 
-        <x-mary-select label="Status" wire:model="status_id" :options="$this->statuses" required class="text-base w-[300px]" />
+        <x-mary-select label="Status" wire:model="status_id" :options="$this->statuses" placeholder="Select a status" class="text-base w-[300px]" />
 
-        <x-mary-select label="Branch" wire:model="branch_id" :options="$this->branches" required class="text-base w-[300px]" />
+        <x-mary-select label="Branch" wire:model="branch_id" :options="$this->branches" placeholder="Select a branch" class="text-base w-[300px]" />
 
     </div>
 
     <!-- Button -->
     <x-slot:actions>
-        <div class="flex justify-end mt-8 w-full">
+        <div class="flex justify-end mt-8 w-[200px]">
             <x-mary-button label="Register"
-                class="btn-primary"
+                class="btn-primary w-full"
                 type="submit" />
         </div>
     </x-slot:actions>
