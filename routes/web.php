@@ -52,6 +52,10 @@ Route::get('/interest_reports', function () {
     return view('interest-reports');
 })->name('reports.interest');
 
+Route::get('/customer_reports', function () {
+    return view('customer-reports');
+})->name('reports.customer');
+
 Route::get('/view_customers', function () {
     return view('view-customers');
 })->name('customers.view');
