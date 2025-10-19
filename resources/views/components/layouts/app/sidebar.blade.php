@@ -61,7 +61,7 @@
 
                     <x-mary-menu-sub title="Branch Management" icon="o-building-office">
                         <x-mary-menu-item title="Create Branch" icon="o-plus-circle" link="{{ route('create.branch') }}" />
-                        <x-mary-menu-item title="View Branches" icon="o-list-bullet" link="#" />
+                        <x-mary-menu-item title="View Branches" icon="o-list-bullet" link="{{ route('branches.view') }}" />
                     </x-mary-menu-sub>
 
                     <x-mary-menu-sub title="Employee Management" icon="o-identification">
@@ -72,6 +72,7 @@
                     <x-mary-menu-separator />
 
                     <x-mary-menu-sub title="Reports" icon="o-chart-bar">
+                        <x-mary-menu-item title="Fixed Deposit Reports" icon="o-currency-dollar" link="{{ route('fd.accounts') }}" />
                         <x-mary-menu-item title="Customer Reports" icon="o-document-chart-bar" link="#" />
                         <x-mary-menu-item title="Transaction Reports" icon="o-currency-dollar" link="#" />
                         <x-mary-menu-item title="Interest Reports" icon="o-calculator" link="{{ route('reports.interest') }}" />
