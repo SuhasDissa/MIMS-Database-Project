@@ -1,17 +1,9 @@
-<x-layouts.auth.clean>
-    <div class=" flex h-[100dvh] w-[100%] items-center justify-center m-0 p-0">
-                <div class="w-[50%] h-full flex items-start justify-center">
-                    <img src="{{ asset('bank3.png') }}" alt="Customer Registration" class="w-full h-full">
-                </div>
-                <div class="p-6 w-[50%] flex items-center justify-center flex-col">
-                    <!-- Title -->
-                    <h2 class="text-4xl font-bold text-white-800 mb-10 text-center">
-                        Deposit Money
-                    </h2>
+<x-layouts.app :title="__('New Transaction')">
+    <div class="max-w-7xl mx-auto">
+        <x-mary-header title="Deposit Funds" subtitle="Easily deposit money into your savings account securely" separator />
 
-                    <!-- Form -->
-                    <livewire:transaction.saving-deposit-form/>
-
-                </div>
-            </div>
-</x-layouts.auth.clean>
+        <x-mary-card class="mt-6">
+            <livewire:transaction.saving-deposit-form/>
+        </x-mary-card>
+    </div>
+</x-layouts.app>
