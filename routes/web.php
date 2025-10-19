@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
+
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -56,6 +58,7 @@ Route::get('/view_customers', function () {
     return view('view-customers');
 })->name('customers.view');
 
+
 Route::get('/view_employees', function () {
     return view('view-employees');
 })->name('employees.view');
@@ -64,9 +67,15 @@ Route::get('/view_transactions', function () {
     return view('view-transactions');
 })->name('transactions.view');
 
+Route::get('/view_branches', function () {
+    return view('view-branches');
+})->name('branches.view');
+
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
 
 
 // Saving account Transactions

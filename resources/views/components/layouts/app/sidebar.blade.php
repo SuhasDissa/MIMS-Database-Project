@@ -61,7 +61,7 @@
 
                     <x-mary-menu-sub title="Branch Management" icon="o-building-office">
                         <x-mary-menu-item title="Create Branch" icon="o-plus-circle" link="{{ route('create.branch') }}" />
-                        <x-mary-menu-item title="View Branches" icon="o-list-bullet" link="#" />
+                        <x-mary-menu-item title="View Branches" icon="o-list-bullet" link="{{ route('branches.view') }}" />
                     </x-mary-menu-sub>
 
                     <x-mary-menu-sub title="Employee Management" icon="o-identification">
