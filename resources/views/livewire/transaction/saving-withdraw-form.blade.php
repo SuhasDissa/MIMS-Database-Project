@@ -112,7 +112,7 @@ new class extends Component {
     <x-slot:actions>
         <div class="flex justify-center mt-6 w-full">
             <x-mary-button label="Transfer Money"
-                class="w-full py-3 font-semibold rounded"
+                class="w-100 py-3 font-semibold rounded bg-blue-900 hover:bg-blue-800 text-white"
                 type="submit" />
         </div>
     </x-slot:actions>
