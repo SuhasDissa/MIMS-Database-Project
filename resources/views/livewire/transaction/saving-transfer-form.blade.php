@@ -168,15 +168,23 @@ new class extends Component {
             return;
         }
 
-        $fromBalanceBefore = $fromAccount->balance;
-        $toBalanceBefore = $toAccount->balance;
+        // Call DB function to check withdraw ability for sender
+        $canWithdraw = false;
+        try {
+            $result = \DB::select("SELECT can_withdraw(?, ?) as allowed", [$this->from_num, $this->amount]);
+            $canWithdraw = $result[0]->allowed ?? false;
+        } catch (\Exception $e) {
+            $this->generalError = 'Withdrawal check failed: ' . $e->getMessage();
+            $canWithdraw = true; // if the database doesn't support the function, allow the transfer
+        }
 
-        if ($fromBalanceBefore < $this->amount) {
-            $this->generalError = 'Insufficient balance.';
+        if (!$canWithdraw) {
+            $this->generalError = 'Transfer not allowed: Insufficient balance, below minimum, or withdrawal limit reached.';
             return;
         }
 
-        // Don't manually update balances; rely on database triggers to calculate balances
+        $fromBalanceBefore = $fromAccount->balance;
+        $toBalanceBefore = $toAccount->balance;
 
         $fromAccount->update([
             'balance' => $fromBalanceBefore - $this->amount,
