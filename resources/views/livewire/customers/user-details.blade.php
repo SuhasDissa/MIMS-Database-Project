@@ -20,7 +20,7 @@ new class extends Component {
 
     public function mount(): void
     {
-        $this->customer->load(['branch', 'status', 'savingsAccounts.accountType', 'fixedDeposits.fdType', 'fixedDeposits.status']);
+        $this->customer->load(['branch', 'status', 'savingsAccounts.accountType', 'fixedDeposits.fdType']);
         $this->initializeData();
     }
 
@@ -310,8 +310,8 @@ new class extends Component {
                                 <div class="text-sm text-warning">Maturity: Rs. {{ number_format($fd->maturity_amount, 2) }}</div>
                             </div>
                             <div class="text-right">
-                                <span class="badge {{ $fd->status->value === 'ACTIVE' ? 'badge-success' : 'badge-warning' }} badge-sm">
-                                    {{ $fd->status->label() }}
+                                <span class="badge {{ $fd->status === 'ACTIVE' ? 'badge-success' : 'badge-warning' }} badge-sm">
+                                    {{ $fd->status }}
                                 </span>
                             </div>
                         </div>
