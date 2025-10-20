@@ -92,7 +92,9 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-
+Route::get('/customer_reports', function () {
+    return view('customer-reports');
+})->name('reports.customer');
 
 // Saving account Transactions
 Route::middleware(['auth'])->group(function () {
