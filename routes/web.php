@@ -62,6 +62,9 @@ Route::get('/view_customers', function () {
     return view('view-customers');
 })->name('customers.view');
 
+Route::get('/customer/{customer}', function (\App\Models\Customer $customer) {
+    return view('user-details', ['customer' => $customer]);
+})->name('customers.details');
 
 Route::get('/view_employees', function () {
     return view('view-employees');
