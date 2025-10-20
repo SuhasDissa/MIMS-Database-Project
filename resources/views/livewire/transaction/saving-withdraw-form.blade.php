@@ -99,8 +99,18 @@ new class extends Component {
 
         $fromAccount = SavingsAccount::where('account_number', $this->account_number)->first();
 
-        if ($this->amount > $fromAccount->balance) {
-            $this->generalError = 'Insufficient funds for withdrawal.';
+        // Call DB function to check withdraw ability
+        $canWithdraw = false;
+        try {
+            $result = \DB::select("SELECT can_withdraw(?, ?) as allowed", [$this->account_number, $this->amount]);
+            $canWithdraw = $result[0]->allowed ?? false;
+        } catch (\Exception $e) {
+            $this->generalError = 'Withdrawal check failed: ' . $e->getMessage();
+            return;
+        }
+
+        if (!$canWithdraw) {
+            $this->generalError = 'Withdrawal not allowed: Insufficient balance, below minimum, or withdrawal limit reached.';
             return;
         }
 
