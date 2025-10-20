@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Employee;
 use Livewire\Volt\Volt as LivewireVolt;
 
 test('login screen can be rendered', function () {
@@ -9,11 +9,11 @@ test('login screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+test('employees can authenticate using the login screen', function () {
+    $employee = Employee::factory()->create();
 
     $response = LivewireVolt::test('auth.login')
-        ->set('email', $user->email)
+        ->set('email', $employee->email)
         ->set('password', 'password')
         ->call('login');
 
@@ -24,11 +24,11 @@ test('users can authenticate using the login screen', function () {
     $this->assertAuthenticated();
 });
 
-test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+test('employees can not authenticate with invalid password', function () {
+    $employee = Employee::factory()->create();
 
     $response = LivewireVolt::test('auth.login')
-        ->set('email', $user->email)
+        ->set('email', $employee->email)
         ->set('password', 'wrong-password')
         ->call('login');
 
@@ -37,10 +37,10 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
-test('users can logout', function () {
-    $user = User::factory()->create();
+test('employees can logout', function () {
+    $employee = Employee::factory()->create();
 
-    $response = $this->actingAs($user)->post('/logout');
+    $response = $this->actingAs($employee)->post('/logout');
 
     $response->assertRedirect('/');
 

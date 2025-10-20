@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\EmployeePosition;
 use App\Models\Employee;
-use App\Models\User;
 use App\Models\CustomerStatusType;
 use App\Models\Branch;
 use App\Models\Customer;
@@ -31,11 +31,42 @@ class DatabaseSeeder extends Seeder
         $this->call(SavingsAccountTypesSeeder::class);
         $this->call(FixedDepositTypesSeeder::class);
 
-        // Create test user
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@test.com',
+        // Create test employee for authentication
+        $testBranch = Branch::factory()->create();
+        Employee::factory()->create([
+            'first_name' => 'Main',
+            'last_name' => 'Manager',
+            'email' => 'manager@test.com',
             'password' => bcrypt('demo'),
+            'phone' => '0771234567',
+            'position' => EmployeePosition::MANAGER,
+            'nic_num' => '200012345678',
+            'branch_id' => $testBranch->id,
+            'is_active' => true,
+        ]);
+
+        Employee::factory()->create([
+            'first_name' => 'Branch',
+            'last_name' => 'Manager',
+            'email' => 'bmanager@test.com',
+            'password' => bcrypt('demo'),
+            'phone' => '0771234567',
+            'position' => EmployeePosition::BRANCH_MANAGER,
+            'nic_num' => '200012345678',
+            'branch_id' => $testBranch->id,
+            'is_active' => true,
+        ]);
+
+        Employee::factory()->create([
+            'first_name' => 'Customer',
+            'last_name' => 'Agent',
+            'email' => 'agent@test.com',
+            'password' => bcrypt('demo'),
+            'phone' => '0771234567',
+            'position' => EmployeePosition::AGENT,
+            'nic_num' => '200012345678',
+            'branch_id' => $testBranch->id,
+            'is_active' => true,
         ]);
 
         // Testing only seeders

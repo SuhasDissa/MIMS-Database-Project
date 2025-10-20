@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Employee;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Volt\Volt;
@@ -14,25 +14,25 @@ test('reset password link screen can be rendered', function () {
 test('reset password link can be requested', function () {
     Notification::fake();
 
-    $user = User::factory()->create();
+    $employee = Employee::factory()->create();
 
     Volt::test('auth.forgot-password')
-        ->set('email', $user->email)
+        ->set('email', $employee->email)
         ->call('sendPasswordResetLink');
 
-    Notification::assertSentTo($user, ResetPassword::class);
+    Notification::assertSentTo($employee, ResetPassword::class);
 });
 
 test('reset password screen can be rendered', function () {
     Notification::fake();
 
-    $user = User::factory()->create();
+    $employee = Employee::factory()->create();
 
     Volt::test('auth.forgot-password')
-        ->set('email', $user->email)
+        ->set('email', $employee->email)
         ->call('sendPasswordResetLink');
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
+    Notification::assertSentTo($employee, ResetPassword::class, function ($notification) {
         $response = $this->get('/reset-password/'.$notification->token);
 
         $response->assertStatus(200);
@@ -44,15 +44,15 @@ test('reset password screen can be rendered', function () {
 test('password can be reset with valid token', function () {
     Notification::fake();
 
-    $user = User::factory()->create();
+    $employee = Employee::factory()->create();
 
     Volt::test('auth.forgot-password')
-        ->set('email', $user->email)
+        ->set('email', $employee->email)
         ->call('sendPasswordResetLink');
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+    Notification::assertSentTo($employee, ResetPassword::class, function ($notification) use ($employee) {
         $response = Volt::test('auth.reset-password', ['token' => $notification->token])
-            ->set('email', $user->email)
+            ->set('email', $employee->email)
             ->set('password', 'password')
             ->set('password_confirmation', 'password')
             ->call('resetPassword');

@@ -28,7 +28,12 @@ new class extends Component {
     public function with(): array
     {
         $query = Customer::query()
-            ->with(['branch', 'status']);
+            ->with(['branch', 'status', 'employee']);
+
+        // Role-based filtering: Agents can only see their assigned customers
+        if (auth()->user()->canOnlyManageAssignedCustomers()) {
+            $query->where('employee_id', auth()->id());
+        }
 
         // Search filter
         if ($this->search) {
