@@ -30,4 +30,11 @@ class Employee extends Model
     {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class, 'employee_id');
+    }
+
+
 }
