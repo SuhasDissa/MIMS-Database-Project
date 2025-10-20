@@ -80,54 +80,65 @@ new class extends Component {
 
             <x-mary-select
                 wire:model.live="perPage"
-                :options="[10 => '10 per page', 25 => '25 per page', 50 => '50 per page']"
+                :options="[['id' => 10, 'name' => '10 per page'], ['id' => 25, 'name' => '25 per page'], ['id' => 50, 'name' => '50 per page']]"
                 placeholder="Items per page"
                 class="w-full sm:w-48" />
         </div>
 
         {{-- FD Accounts Table --}}
         <div class="overflow-x-auto">
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th class="font-semibold">FD Number</th>
-                        <th class="font-semibold">Customer</th>
-                        <th class="font-semibold">FD Type</th>
-                        <th class="font-semibold">Branch</th>
-                        <th class="font-semibold text-right">Principal Amount</th>
-                        <th class="font-semibold text-right">Maturity Amount</th>
-                        <th class="font-semibold">Start Date</th>
-                        <th class="font-semibold">Maturity Date</th>
-                        <th class="font-semibold">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($activeFds as $fd)
-                        <tr class="hover">
-                            <td class="font-mono text-primary">{{ $fd->fd_number }}</td>
-                            <td>
-                                <div class="font-medium">{{ $fd->customer->name }}</div>
-                                <div class="text-xs text-gray-500">{{ $fd->customer->nic }}</div>
-                            </td>
-                            <td>{{ $fd->fdType->name }}</td>
-                            <td>{{ $fd->branch->name }}</td>
-                            <td class="text-right font-semibold">Rs. {{ number_format($fd->principal_amount, 2) }}</td>
-                            <td class="text-right font-semibold text-success">Rs. {{ number_format($fd->maturity_amount, 2) }}</td>
-                            <td>{{ $fd->start_date->format('M d, Y') }}</td>
-                            <td>{{ $fd->maturity_date->format('M d, Y') }}</td>
-                            <td>
-                                <span class="badge badge-success">{{ $fd->status->label() }}</span>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="9" class="text-center py-8 text-gray-500">
-                                No active FD accounts found.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+            <x-mary-table :headers="[
+                ['key' => 'fd_number', 'label' => 'FD Number', 'class' => 'font-semibold'],
+                ['key' => 'customer', 'label' => 'Customer', 'class' => 'font-semibold'],
+                ['key' => 'fd_type', 'label' => 'FD Type', 'class' => 'font-semibold'],
+                ['key' => 'branch', 'label' => 'Branch', 'class' => 'font-semibold'],
+                ['key' => 'principal_amount', 'label' => 'Principal Amount', 'class' => 'font-semibold text-right'],
+                ['key' => 'maturity_amount', 'label' => 'Maturity Amount', 'class' => 'font-semibold text-right'],
+                ['key' => 'start_date', 'label' => 'Start Date', 'class' => 'font-semibold'],
+                ['key' => 'maturity_date', 'label' => 'Maturity Date', 'class' => 'font-semibold'],
+                ['key' => 'status', 'label' => 'Status', 'class' => 'font-semibold'],
+            ]" :rows="$activeFds">
+
+                @scope('cell_fd_number', $fd)
+                    <span class="badge badge-primary badge-soft font-mono">{{ $fd->fd_number }}</span>
+                @endscope
+
+                @scope('cell_customer', $fd)
+                    <div class="flex flex-col">
+                        <span class="font-medium text-primary">{{ $fd->customer->first_name . ' ' . $fd->customer->last_name }}</span>
+                        <span class="text-xs text-base-content/60">{{ $fd->customer->id_number }}</span>
+                    </div>
+                @endscope
+
+                @scope('cell_fd_type', $fd)
+                    <span class="badge badge-info badge-soft">{{ $fd->fdType->name }}</span>
+                @endscope
+
+                @scope('cell_branch', $fd)
+                    <span class="text-base-content/80">{{ $fd->branch->branch_name }}</span>
+                @endscope
+
+                @scope('cell_principal_amount', $fd)
+                    <span class="font-semibold text-primary text-right block">Rs. {{ number_format($fd->principal_amount, 2) }}</span>
+                @endscope
+
+                @scope('cell_maturity_amount', $fd)
+                    <span class="font-semibold text-success text-right block">Rs. {{ number_format($fd->maturity_amount, 2) }}</span>
+                @endscope
+
+                @scope('cell_start_date', $fd)
+                    <span class="text-base-content/70">{{ $fd->start_date->format('M d, Y') }}</span>
+                @endscope
+
+                @scope('cell_maturity_date', $fd)
+                    <span class="text-base-content/70">{{ $fd->maturity_date->format('M d, Y') }}</span>
+                @endscope
+
+                @scope('cell_status', $fd)
+                    <span class="badge badge-success badge-soft">{{ $fd->status->label() }}</span>
+                @endscope
+
+            </x-mary-table>
         </div>
 
         {{-- Pagination --}}
