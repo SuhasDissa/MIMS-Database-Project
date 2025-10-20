@@ -65,27 +65,27 @@ new class extends Component {
                 ['key' => 'phone', 'label' => 'Phone', 'class' => 'font-semibold'],
             ]" :rows="$branches">
                 @scope('cell_branch_code', $branch)
-                    <span class="font-mono">{{ $branch->branch_code }}</span>
+                    <span class="badge badge-primary badge-soft font-mono">{{ $branch->branch_code }}</span>
                 @endscope
 
                 @scope('cell_branch_name', $branch)
-                    <span class="font-semibold">{{ $branch->branch_name }}</span>
+                    <span class="font-semibold text-primary">{{ $branch->branch_name }}</span>
                 @endscope
 
                 @scope('cell_address', $branch)
-                    {{ $branch->address }}
+                    <span class="text-base-content/80">{{ $branch->address }}</span>
                 @endscope
 
                 @scope('cell_city', $branch)
-                    {{ $branch->city }}
+                    <span class="badge badge-info badge-soft">{{ $branch->city }}</span>
                 @endscope
 
                 @scope('cell_postal_code', $branch)
-                    {{ $branch->postal_code }}
+                    <span class="font-mono text-base-content/70">{{ $branch->postal_code }}</span>
                 @endscope
 
                 @scope('cell_phone', $branch)
-                    {{ $branch->phone }}
+                    <span class="text-primary font-medium">{{ $branch->phone }}</span>
                 @endscope
             </x-mary-table>
         </div>
