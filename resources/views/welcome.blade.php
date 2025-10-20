@@ -12,8 +12,7 @@
         <div class="container mx-auto px-4 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-2">
-                    <x-app-logo class="h-8 w-auto" />
-                    <span class="text-xl font-bold text-primary">Trust Bank</span>
+                    <x-app-logo class="h-15 w-auto" />
                 </div>
 
                 @if (Route::has('login'))
@@ -93,8 +92,15 @@
             </div>
 
             <div class="relative">
+                <!-- Round Logo Display -->
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+                    <div class="bg-white dark:bg-gray-800 rounded-full p-8 shadow-2xl">
+                        <x-app-logo-icon class="size-32 md:size-40" />
+                    </div>
+                </div>
+                
                 <div class="relative z-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl p-8 backdrop-blur-sm border border-primary/20">
-                    <img src="{{ asset('bank.jpg') }}" alt="Banking" class="rounded-2xl shadow-2xl w-full h-auto" onerror="this.style.display='none'">
+                    <img src="{{ asset('bank.jpg') }}" alt="Banking" class="rounded-2xl shadow-2xl w-full h-auto opacity-60" onerror="this.style.display='none'">
                     <div class="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent rounded-3xl"></div>
                 </div>
                 <div class="absolute -bottom-6 -left-6 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
@@ -281,41 +287,13 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="bg-gradient-to-r from-primary to-secondary py-16 lg:py-24">
-        <div class="container mx-auto px-4 lg:px-8 text-center">
-            <h2 class="text-3xl lg:text-5xl font-bold text-white mb-6">
-                Ready to Get Started?
-            </h2>
-            <p class="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-                Join thousands of satisfied customers and experience banking like never before
-            </p>
-            @guest
-                <a href="{{ route('register') }}" class="btn btn-lg bg-white text-primary hover:bg-gray-100 border-0">
-                    Open Your Account Today
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                    </svg>
-                </a>
-            @else
-                <a href="{{ route('dashboard') }}" class="btn btn-lg bg-white text-primary hover:bg-gray-100 border-0">
-                    Go to Dashboard
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                    </svg>
-                </a>
-            @endguest
-        </div>
-    </section>
-
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="container mx-auto px-4 lg:px-8">
             <div class="grid md:grid-cols-4 gap-8">
                 <div>
                     <div class="flex items-center space-x-2 mb-4">
-                        <x-app-logo class="h-8 w-auto text-white" />
-                        <span class="text-xl font-bold">Trust Bank</span>
+                        <x-app-logo class="h-32 w-auto text-white" />
                     </div>
                     <p class="text-gray-400 text-sm">
                         Your trusted partner for all banking needs
