@@ -65,6 +65,10 @@ Route::middleware(['auth', 'employee.branch_manager'])->group(function () {
     Route::get('/customer_reports', function () {
         return view('customer-reports');
     })->name('reports.customer');
+
+    Route::get('/report_transaction', function () {
+    return view('transaction-report');
+})->name('transactions.report');
 });
 
 
