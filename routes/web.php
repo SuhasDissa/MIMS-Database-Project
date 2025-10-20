@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
+
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -52,22 +54,47 @@ Route::get('/interest_reports', function () {
     return view('interest-reports');
 })->name('reports.interest');
 
-Route::get('/customer_reports', function () {
-    return view('customer-reports');
-})->name('reports.customer');
+Route::get('/employee_reports', function () {
+    return view('employee-reports');
+})->name('reports.emp');
+
+Route::get('/employee_wise_customers/{employee}', function (\App\Models\Employee $employee) {
+    return view('employee-wise-customers', compact('employee'));
+})->name('reports.empcus');
+
+
+Route::get('/fd_accounts', function () {
+    return view('fd-accounts');
+})->name('fd.accounts');
 
 Route::get('/view_customers', function () {
     return view('view-customers');
 })->name('customers.view');
 
+Route::get('/customer/{customer}', function (\App\Models\Customer $customer) {
+    return view('user-details', ['customer' => $customer]);
+})->name('customers.details');
+
 Route::get('/view_employees', function () {
     return view('view-employees');
 })->name('employees.view');
+
+Route::get('/view_transactions', function () {
+    return view('view-transactions');
+})->name('transactions.view');
+
+Route::get('/view_branches', function () {
+    return view('view-branches');
+})->name('branches.view');
+
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+Route::get('/customer_reports', function () {
+    return view('customer-reports');
+})->name('reports.customer');
 
 // Saving account Transactions
 Route::middleware(['auth'])->group(function () {

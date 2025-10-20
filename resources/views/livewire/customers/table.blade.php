@@ -89,7 +89,7 @@ new class extends Component {
                 ['key' => 'created_at', 'label' => 'Created Date', 'class' => 'font-semibold'],
             ]" :rows="$customers">
                 @scope('cell_name', $customer)
-                    <span class="font-semibold">{{ $customer->first_name }} {{ $customer->last_name }}</span>
+                    <a href="{{ route('customers.details', $customer) }}" class="font-bold text-primary underline">{{ $customer->first_name }} {{ $customer->last_name }}</a>
                 @endscope
 
                 @scope('cell_email', $customer)

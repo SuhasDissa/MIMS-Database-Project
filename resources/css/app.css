@@ -98,7 +98,7 @@ select:focus[data-flux-control] {
 @plugin "daisyui/theme" {
   name: "corporate";
   default: true;
-  prefersdark: true;
+  prefersdark: false;
   color-scheme: "light";
   --color-base-100: oklch(100% 0 0);
   --color-base-200: oklch(93% 0 0);

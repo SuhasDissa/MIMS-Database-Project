@@ -237,7 +237,7 @@ new class extends Component {
     {{-- Additional Insights Grid --}}
     <div class="grid gap-6 lg:grid-cols-2">
         {{-- Average Interest Rates by Customer Status --}}
-        <x-mary-card title="Average Interest Rates by Customer Status" shadow separator>
+        <x-mary-card title="Interest Rates by Customer Status" shadow separator>
             <div class="space-y-4">
                 @foreach($avgInterestRates as $rate)
                     <div class="flex items-center justify-between">
@@ -245,7 +245,7 @@ new class extends Component {
                             <div class="w-3 h-3 rounded-full bg-primary"></div>
                             <span class="font-medium">{{ $rate['status'] }}</span>
                         </div>
-                        <span class="badge badge-primary badge-lg">{{ number_format($rate['rate'], 2) }}%</span>
+                        <span class="badge badge-primary badge-lg">{{ number_format($rate['rate'] * 100, 1) }}%</span>
                     </div>
                 @endforeach
             </div>
