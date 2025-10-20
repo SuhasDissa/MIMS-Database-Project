@@ -23,6 +23,7 @@ class Customer extends Model
         'id_type',
         'id_number',
         'status_id',
+        'employee_id',
         'branch_id',
     ];
 
@@ -50,4 +51,10 @@ class Customer extends Model
     {
         return $this->belongsTo(CustomerStatusType::class, 'status_id');
     }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
 }

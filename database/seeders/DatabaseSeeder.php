@@ -40,9 +40,9 @@ class DatabaseSeeder extends Seeder
 
         // Testing only seeders
         Branch::factory(10)->create();
+        Employee::factory(20)->create();
         Customer::factory(100)->create();
         SavingsAccount::factory(500)->create();
-        Employee::factory(20)->create();
 
         $this->call(SavingsTransactionsSeeder::class);
         $this->call(FixedDepositsSeeder::class);

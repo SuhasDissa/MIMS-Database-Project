@@ -54,6 +54,15 @@ Route::get('/interest_reports', function () {
     return view('interest-reports');
 })->name('reports.interest');
 
+Route::get('/employee_reports', function () {
+    return view('employee-reports');
+})->name('reports.emp');
+
+Route::get('/employee_wise_customers/{employee}', function (\App\Models\Employee $employee) {
+    return view('employee-wise-customers', compact('employee'));
+})->name('reports.empcus');
+
+
 Route::get('/fd_accounts', function () {
     return view('fd-accounts');
 })->name('fd.accounts');

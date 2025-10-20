@@ -15,7 +15,7 @@ return new class extends Migration
             $table->dateTime('date_of_birth');
             $table->enum('gender', ['M', 'F', 'Other']);
             $table->string('email', 100);
-            $table->string('phone', 15);
+            $table->string('phone', 25);
             $table->text('address');
             $table->string('city', 50);
             $table->string('state', 50);
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('id_type', 20);
             $table->string('id_number', 50);
             $table->foreignId('status_id')->constrained('customer_status_types');
+            $table->foreignId('employee_id')->constrained('employee');
             $table->foreignId('branch_id')->constrained('branch');
             $table->timestamps();
         });
