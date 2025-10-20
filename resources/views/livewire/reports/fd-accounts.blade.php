@@ -87,7 +87,7 @@ new class extends Component {
 
         {{-- FD Accounts Table --}}
         <div class="overflow-x-auto">
-            <table class="table table-sm">
+            <table class="table">
                 <thead>
                     <tr>
                         <th class="font-semibold">FD Number</th>

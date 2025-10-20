@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\SavingsAccount;
+use App\Models\Customer;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
@@ -29,6 +30,15 @@ new class extends Component {
     {
         $query = SavingsAccount::query()
             ->with(['accountType', 'branch', 'customers']);
+
+        // Role-based filtering: Agents can only see accounts of their assigned customers
+        if (auth()->user()->canOnlyManageAssignedCustomers()) {
+            $assignedCustomerIds = Customer::where('employee_id', auth()->id())->pluck('id');
+
+            $query->whereHas('customers', function($q) use ($assignedCustomerIds) {
+                $q->whereIn('customer_id', $assignedCustomerIds);
+            });
+        }
 
         // Search filter
         if ($this->search) {

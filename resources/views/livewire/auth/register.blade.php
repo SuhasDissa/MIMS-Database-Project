@@ -1,16 +1,23 @@
 <?php
 
-use App\Models\User;
+use App\Enums\EmployeePosition;
+use App\Models\Employee;
+use App\Models\Branch;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('components.layouts.auth')] class extends Component {
-    public string $name = '';
+    public string $first_name = '';
+    public string $last_name = '';
     public string $email = '';
+    public string $phone = '';
+    public string $position = '';
+    public string $nic_num = '';
     public string $password = '';
     public string $password_confirmation = '';
 
@@ -20,16 +27,22 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public function register(): void
     {
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'first_name' => ['required', 'string', 'max:50'],
+            'last_name' => ['required', 'string', 'max:50'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:100', 'unique:employee,email'],
+            'phone' => ['required', 'string', 'max:15'],
+            'position' => ['required', Rule::enum(EmployeePosition::class)],
+            'nic_num' => ['required', 'string', 'max:12', 'unique:employee,nic_num'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['branch_id'] = Branch::first()->id; // Assign to first branch by default
+        $validated['is_active'] = true;
 
-        event(new Registered(($user = User::create($validated))));
+        event(new Registered(($employee = Employee::create($validated))));
 
-        Auth::login($user);
+        Auth::login($employee);
 
         $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
     }
@@ -42,15 +55,25 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <x-mary-form wire:submit="register" class="space-y-6">
-        <!-- Name -->
+        <!-- First Name -->
         <x-mary-input
-            wire:model="name"
-            :label="__('Name')"
+            wire:model="first_name"
+            :label="__('First Name')"
             type="text"
             required
             autofocus
-            autocomplete="name"
-            :placeholder="__('Full name')"
+            autocomplete="given-name"
+            :placeholder="__('First name')"
+        />
+
+        <!-- Last Name -->
+        <x-mary-input
+            wire:model="last_name"
+            :label="__('Last Name')"
+            type="text"
+            required
+            autocomplete="family-name"
+            :placeholder="__('Last name')"
         />
 
         <!-- Email Address -->
@@ -61,6 +84,34 @@ new #[Layout('components.layouts.auth')] class extends Component {
             required
             autocomplete="email"
             placeholder="email@example.com"
+        />
+
+        <!-- Phone -->
+        <x-mary-input
+            wire:model="phone"
+            :label="__('Phone')"
+            type="text"
+            required
+            autocomplete="tel"
+            :placeholder="__('Phone number')"
+        />
+
+        <!-- Position -->
+        <x-mary-select
+            wire:model="position"
+            :label="__('Position')"
+            :options="@php echo json_encode(App\Enums\EmployeePosition::options()) @endphp"
+            required
+            :placeholder="__('Select position')"
+        />
+
+        <!-- NIC Number -->
+        <x-mary-input
+            wire:model="nic_num"
+            :label="__('NIC Number')"
+            type="text"
+            required
+            :placeholder="__('National ID number')"
         />
 
         <!-- Password -->

@@ -1,69 +1,79 @@
 <?php
 
-use App\Models\User;
+use App\Enums\EmployeePosition;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public string $name = '';
+    public string $first_name = '';
+    public string $last_name = '';
     public string $email = '';
+    public string $phone = '';
+    public string $position = '';
 
     /**
      * Mount the component.
      */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $employee = Auth::user();
+        $this->first_name = $employee->first_name;
+        $this->last_name = $employee->last_name;
+        $this->email = $employee->email;
+        $this->phone = $employee->phone;
+        $this->position = $employee->position->value;
     }
 
     /**
-     * Update the profile information for the currently authenticated user.
+     * Update the profile information for the currently authenticated employee.
      */
     public function updateProfileInformation(): void
     {
-        $user = Auth::user();
+        $employee = Auth::user();
 
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-
+            'first_name' => ['required', 'string', 'max:50'],
+            'last_name' => ['required', 'string', 'max:50'],
+            'phone' => ['required', 'string', 'max:15'],
+            'position' => ['required', Rule::enum(EmployeePosition::class)],
             'email' => [
                 'required',
                 'string',
                 'lowercase',
                 'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($user->id)
+                'max:100',
+                Rule::unique('employee', 'email')->ignore($employee->id)
             ],
         ]);
 
-        $user->fill($validated);
+        $employee->fill($validated);
 
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
+        if ($employee->isDirty('email')) {
+            $employee->email_verified_at = null;
         }
 
-        $user->save();
+        $employee->save();
 
-        $this->dispatch('profile-updated', name: $user->name);
+        $this->dispatch('profile-updated', name: $employee->name);
     }
 
     /**
-     * Send an email verification notification to the current user.
+     * Send an email verification notification to the current employee.
      */
     public function resendVerificationNotification(): void
     {
-        $user = Auth::user();
+        $employee = Auth::user();
 
-        if ($user->hasVerifiedEmail()) {
+        if ($employee->hasVerifiedEmail()) {
             $this->redirectIntended(default: route('dashboard', absolute: false));
 
             return;
         }
 
-        $user->sendEmailVerificationNotification();
+        $employee->sendEmailVerificationNotification();
 
         Session::flash('status', 'verification-link-sent');
     }
@@ -72,9 +82,20 @@ new class extends Component {
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <x-settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
+    <x-settings.layout :heading="__('Profile')" :subheading="__('Update your personal information')">
         <x-mary-form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <x-mary-input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+            <x-mary-input wire:model="first_name" :label="__('First Name')" type="text" required autofocus autocomplete="given-name" />
+
+            <x-mary-input wire:model="last_name" :label="__('Last Name')" type="text" required autocomplete="family-name" />
+
+            <x-mary-input wire:model="phone" :label="__('Phone')" type="text" required autocomplete="tel" />
+
+            <x-mary-select
+                wire:model="position"
+                :label="__('Position')"
+                :options="@php echo json_encode(App\Enums\EmployeePosition::options()) @endphp"
+                required
+            />
 
             <div>
                 <x-mary-input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
