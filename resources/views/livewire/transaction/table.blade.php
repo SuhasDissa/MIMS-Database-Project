@@ -86,19 +86,39 @@ new class extends Component {
             ]" :rows="$transactions">
 
                 @scope('cell_type', $transaction)
-                    {{ $transaction->type->name }}
+                    @if($transaction->type->value === 'DEPOSIT')
+                        <span class="badge badge-success badge-soft">{{ $transaction->type->name }}</span>
+                    @elseif($transaction->type->value === 'WITHDRAWAL')
+                        <span class="badge badge-error badge-soft">{{ $transaction->type->name }}</span>
+                    @else
+                        <span class="badge badge-info badge-soft">{{ $transaction->type->name }}</span>
+                    @endif
                 @endscope
 
                 @scope('cell_from_account', $transaction)
-                    {{ $transaction->fromAccount->account_number ?? '-' }}
+                    @if($transaction->fromAccount)
+                        <a href="{{ route('accounts.details', $transaction->fromAccount->id) }}" class="font-mono text-primary underline">{{ $transaction->fromAccount->account_number }}</a>
+                    @else
+                        <span class="text-base-content/50">-</span>
+                    @endif
                 @endscope
 
                 @scope('cell_to_account', $transaction)
-                    {{ $transaction->toAccount->account_number ?? '-' }}
+                    @if($transaction->toAccount)
+                        <a href="{{ route('accounts.details', $transaction->toAccount->id) }}" class="font-mono text-primary underline">{{ $transaction->toAccount->account_number }}</a>
+                    @else
+                        <span class="text-base-content/50">-</span>
+                    @endif
                 @endscope
 
                 @scope('cell_amount', $transaction)
-                    ${{ number_format($transaction->amount, 2) }}
+                    @if($transaction->type->value === 'DEPOSIT')
+                        <span class="font-semibold text-success">+ Rs. {{ number_format($transaction->amount, 2) }}</span>
+                    @elseif($transaction->type->value === 'WITHDRAWAL')
+                        <span class="font-semibold text-error">- Rs. {{ number_format($transaction->amount, 2) }}</span>
+                    @else
+                        <span class="font-semibold text-info">Rs. {{ number_format($transaction->amount, 2) }}</span>
+                    @endif
                 @endscope
 
                 @scope('cell_status', $transaction)
