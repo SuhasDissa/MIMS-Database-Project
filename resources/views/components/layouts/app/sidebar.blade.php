@@ -108,6 +108,9 @@
 
                         <x-mary-menu-sub title="Reports & Analytics" icon="o-chart-bar">
                             <x-mary-menu-item title="Employee Reports" icon="o-document-chart-bar" link="{{ route('reports.emp') }}" />
+                         <x-mary-menu-item title="Fixed Deposit Reports" icon="o-currency-dollar" link="{{ route('fd.accounts') }}" />
+                        <x-mary-menu-item title="Agent Customer Reports" icon="o-document-chart-bar" link="{{ route('reports.emp') }}" />
+                        <x-mary-menu-item title="Transaction Reports" icon="o-currency-dollar" link="{{ route('transactions.report') }}" />
                             <x-mary-menu-item title="Interest Reports" icon="o-calculator" link="{{ route('reports.interest') }}" />
                         </x-mary-menu-sub>
                     @endif
