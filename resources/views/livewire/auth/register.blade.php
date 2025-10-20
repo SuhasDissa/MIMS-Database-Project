@@ -100,7 +100,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <x-mary-select
             wire:model="position"
             :label="__('Position')"
-            :options="@php echo json_encode(App\Enums\EmployeePosition::options()) @endphp"
+            :options="App\Enums\EmployeePosition::options()"
             required
             :placeholder="__('Select position')"
         />

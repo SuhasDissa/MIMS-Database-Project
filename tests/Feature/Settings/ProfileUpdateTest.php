@@ -18,7 +18,7 @@ test('profile information can be updated', function () {
         ->set('first_name', 'Test')
         ->set('last_name', 'Employee')
         ->set('phone', '0771234567')
-        ->set('position', 'Manager')
+        ->set('position', 'manager')
         ->set('email', 'test@example.com')
         ->call('updateProfileInformation');
 
@@ -41,7 +41,7 @@ test('email verification status is unchanged when email address is unchanged', f
         ->set('first_name', $employee->first_name)
         ->set('last_name', $employee->last_name)
         ->set('phone', $employee->phone)
-        ->set('position', $employee->position)
+        ->set('position', $employee->position->value)
         ->set('email', $employee->email)
         ->call('updateProfileInformation');
 
