@@ -1,33 +1,12 @@
-@php
-    use App\Models\SavingsTransaction;
-    use App\Models\SavingsAccount;
-@endphp
-
 <x-layouts.app>
     <div class="space-y-6">
         {{-- Page Header --}}
         <div>
-            <x-mary-header title="Transaction Report" subtitle="Search transactions by account number" separator />
+            <x-mary-header title="Transaction Report" subtitle="Search transactions by account number or customer name" separator />
         </div>
 
-        {{-- Search Form --}}
-        <x-mary-card title="Search Account" shadow>
-            <form method="GET" class="space-y-4">
-                <div class="flex gap-4">
-                    <div class="flex-1">
-                        <x-mary-input
-                            name="account_number"
-                            label="Account Number"
-                            placeholder="Enter account number"
-                            value="{{ request('account_number') }}"
-                        />
-                    </div>
-                    <div class="flex items-end">
-                        <x-mary-button type="submit" label="Search" icon="o-magnifying-glass" />
-                    </div>
-                </div>
-            </form>
-        </x-mary-card>
+        {{-- Livewire Transaction Report Component --}}
+        @livewire('reports.transaction-report')
 
         @php
             $accountNumber = request('account_number');
@@ -35,25 +14,76 @@
             $transactions = collect([]);
 
             if ($accountNumber) {
-                $account =SavingsAccount::with(['customers', 'accountType'])
-                ->where('account_number', 'like', '%' . $accountNumber . '%')
-                ->orWhereHas('customers', function($query) use ($accountNumber) {
-                    $query->where('first_name', 'like', '%' . $accountNumber . '%')
-                          ->orWhere('last_name', 'like', '%' . $accountNumber . '%');
-                })->first();
-                if ($account) {
-                    $transactions = SavingsTransaction::with(['fromAccount', 'toAccount'])
-                        ->where(function($query) use ($account) {
-                            $query->where('from_id', $account->id)
-                                  ->orWhere('to_id', $account->id);
-                        })
-                        ->orderBy('created_at', 'desc')
-                        ->paginate(25);
+                // Get all matching accounts
+                $accounts = SavingsAccount::with(['customers', 'accountType'])
+                    ->where(function($query) use ($accountNumber) {
+                        $query->where('account_number', 'like', '%' . $accountNumber . '%')
+                              ->orWhereHas('customers', function($subQuery) use ($accountNumber) {
+                                  $subQuery->where('first_name', 'like', '%' . $accountNumber . '%')
+                                          ->orWhere('last_name', 'like', '%' . $accountNumber . '%');
+                              });
+                    })
+                    ->get();
+
+                $account = null;
+                $transactions = collect([]);
+
+                // Only show transactions if exact account number is provided
+                if ($accountNumber === request('account_number')) {
+                    $account = SavingsAccount::where('account_number', $accountNumber)->first();
+                    if ($account) {
+                        $transactions = SavingsTransaction::with(['fromAccount', 'toAccount'])
+                            ->where(function($query) use ($account) {
+                                $query->where('from_id', $account->id)
+                                      ->orWhere('to_id', $account->id);
+                            })
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(25);
+                    }
                 }
             }
         @endphp
 
         @if(request('account_number'))
+            @if($accounts->isNotEmpty())
+                {{-- Matching Accounts --}}
+                <x-mary-card title="Matching Accounts" shadow>
+                    <div class="space-y-4">
+                        @foreach($accounts as $matchingAccount)
+                            <div class="p-4 border rounded-lg hover:bg-gray-50">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-mono text-lg font-semibold">{{ $matchingAccount->account_number }}</div>
+                                        <div class="text-sm text-gray-500">
+                                            Customers: 
+                                            @foreach($matchingAccount->customers as $customer)
+                                                {{ $customer->first_name }} {{ $customer->last_name }}@if(!$loop->last), @endif
+                                            @endforeach
+                                        </div>
+                                        <div class="mt-1">
+                                            <span class="badge badge-{{ $matchingAccount->status === 'ACTIVE' ? 'success' : 'warning' }}">
+                                                {{ $matchingAccount->status }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-lg font-semibold text-success">
+                                            Rs. {{ number_format((float)$matchingAccount->balance, 2) }}
+                                        </div>
+                                        <div class="mt-2">
+                                            <a href="{{ url()->current() }}?account_number={{ $matchingAccount->account_number }}" 
+                                               class="btn btn-primary btn-sm">
+                                                View Transactions
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </x-mary-card>
+            @endif
+            
             @if($account)
                 {{-- Account Info --}}
                 <x-mary-card title="Account Information" shadow class="mb-6">
@@ -169,8 +199,8 @@
                 <x-mary-card class="bg-warning/10">
                     <div class="text-center py-6">
                         <x-mary-icon name="o-exclamation-triangle" class="w-12 h-12 mx-auto text-warning mb-4" />
-                        <p class="text-lg font-semibold">Account Not Found</p>
-                        <p class="text-gray-500">No account found with the number "{{ request('account_number') }}"</p>
+                        <p class="text-lg font-semibold">No Matching Accounts</p>
+                        <p class="text-gray-500">No accounts found matching "{{ request('account_number') }}"</p>
                     </div>
                 </x-mary-card>
             @endif
