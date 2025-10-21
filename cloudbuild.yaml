@@ -1,0 +1,79 @@
+# This is your main CI/CD pipeline
+steps:
+  # 1. Build the Docker container
+  # This runs the Dockerfile, builds assets, and tags the image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA'
+      - '.'
+
+  # 2. Push the container to Artifact Registry
+  # This makes the image available for deployment
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Push
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA'
+
+  # 3. Run Database Migrations
+  # This is the "best practice" part:
+  # It uses the NEWLY built image to run a one-off command.
+  - name: 'gcr.io/google-appengine/exec-wrapper'
+    id: Migrate
+    args:
+      - '-i'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA' # Use the image we just built
+      - '-s'
+      - '${_DB_CONNECTION_NAME}' # Inject DB connection name from a variable
+      - '-e'
+      - 'SECRET_ID=projects/$PROJECT_NUMBER/secrets/laravel-env/versions/latest' # Mount the secret
+      # This command is run inside the container, connected to the database
+      - '--'
+      - 'php'
+      - 'artisan'
+      - 'migrate'
+      - '--force' # Important: auto-confirms the migration in production
+    secretEnv: ['SECRET_ID']
+
+  # 4. Deploy to Cloud Run
+  # This updates the service to use the new container image
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: Deploy
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-secrets=projects/$PROJECT_NUMBER/secrets/laravel-env/versions/latest=DOT_ENV_FILE' # Mount the .env file
+      - '--cloudsql-instances'
+      - '${_DB_CONNECTION_NAME}'
+    # We wait for the 'Migrate' step to finish before deploying
+    waitFor: ['Migrate']
+
+# --- Configuration ---
+
+# This is where the final image will be stored
+images:
+  - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA'
+
+# These are variables you set up in your Cloud Build Trigger
+substitutions:
+  _SERVICE_NAME: 'my-laravel-app' # The name of your Cloud Run service
+  _REGION: 'us-central1' # The region for your service
+  _DB_CONNECTION_NAME: 'my-project:us-central1:my-sql-instance' # Find this in your Cloud SQL instance details
+
+# Access the secret containing your .env file
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_NUMBER/secrets/laravel-env/versions/latest
+      env: 'SECRET_ID' # Maps the secret to the 'SECRET_ID' variable used in the migrate step
