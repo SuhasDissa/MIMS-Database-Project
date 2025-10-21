@@ -1,0 +1,64 @@
+name: Deploy Laravel to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    # 4. Set the runner environment
+    runs-on: ubuntu-latest
+
+    # 5. Define the steps
+    steps:
+      # 5.1. Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Sync files to VPS
+        uses: appleboy/rsync-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_SSH_HOST }}
+          username: ${{ secrets.VPS_SSH_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          source: "./"
+          target: ${{ secrets.VPS_DEPLOY_PATH }}
+          exclude: |
+            .git
+            .github
+            node_modules
+            .env
+            /storage/framework/sessions/*
+            /storage/framework/views/*
+            /storage/framework/cache/data/*
+            /storage/logs/*.log
+            /public/storage
+
+      - name: Run post-deployment commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_SSH_HOST }}
+          username: ${{ secrets.VPS_SSH_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          script: |
+            cd ${{ secrets.VPS_DEPLOY_PATH }}
+
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            npm install
+
+            npm run build
+
+            php artisan migrate --force
+
+            php artisan cache:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            php artisan storage:link
+
+            # php artisan queue:restart
