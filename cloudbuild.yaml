@@ -77,3 +77,6 @@ availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_NUMBER/secrets/laravel-env/versions/latest
       env: 'SECRET_ID' # Maps the secret to the 'SECRET_ID' variable used in the migrate step
+
+options:
+  logging: CLOUD_LOGGING_ONLY
