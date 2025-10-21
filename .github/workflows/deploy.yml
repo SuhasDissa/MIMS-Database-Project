@@ -3,15 +3,26 @@ on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Sync files and run deployment
+      
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_SSH_HOST }}
+          username: ${{ secrets.VPS_SSH_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          source: ".,!.git,!.github,!node_modules,!.env,!storage/framework/sessions/*,!storage/framework/views/*,!storage/framework/cache/data/*,!storage/logs/*.log,!public/storage"
+          target: ${{ secrets.VPS_DEPLOY_PATH }}
+          strip_components: 0
+          overwrite: true
+      
+      - name: Run deployment commands
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_SSH_HOST }}
@@ -20,14 +31,6 @@ jobs:
           port: ${{ secrets.VPS_SSH_PORT || 22 }}
           script: |
             cd ${{ secrets.VPS_DEPLOY_PATH }}
-            
-            # Remove excluded files/folders before sync
-            rm -rf .git .github node_modules storage/framework/sessions/* storage/framework/views/* storage/framework/cache/data/* storage/logs/*.log public/storage 2>/dev/null || true
-            
-            # Copy new files from repository
-            rsync -avz --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='.env' --exclude='storage/framework/sessions/*' --exclude='storage/framework/views/*' --exclude='storage/framework/cache/data/*' --exclude='storage/logs/*.log' --exclude='public/storage' ${{ github.workspace }}/ ./
-            
-            # Run deployment commands
             composer install --no-dev --optimize-autoloader --no-interaction
             npm install
             npm run build
