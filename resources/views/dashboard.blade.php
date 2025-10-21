@@ -11,7 +11,7 @@
     $totalSavingsAccounts = SavingsAccount::count();
     $totalFixedDeposits = FixedDeposit::count();
     $totalSavingsBalance = SavingsAccount::sum('balance');
-    $totalFdAmount = FixedDeposit::sum('amount');
+    $totalFdAmount = FixedDeposit::sum('principal_amount');
 @endphp
 
 <x-layouts.app>
