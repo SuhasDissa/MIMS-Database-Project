@@ -101,9 +101,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
             wire:model="position"
             :label="__('Position')"
             :options="App\Enums\EmployeePosition::options()"
-            required
-            :placeholder="__('Select position')"
+            option-label="label"
+            option-value="value"
+            required  
         />
+
 
         <!-- NIC Number -->
         <x-mary-input
