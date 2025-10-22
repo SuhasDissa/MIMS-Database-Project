@@ -22,6 +22,8 @@ new class extends Component {
 
     public $nic_input = '';
     public $customer_list = []; // NIC + Name + Age
+    public $customer_search = '';
+    public $filteredCustomers = [];
 
     protected $rules = [
         // Migration creates table `branch` (singular) so validate against that
@@ -44,6 +46,22 @@ new class extends Component {
 
         // Optional: set first branch as default
         $this->branch_id = $this->branches[0]['id'] ?? null;
+
+        // Load initial customers for datalist
+        $this->filteredCustomers = Customer::limit(10)->get();
+    }
+
+    public function updatedCustomerSearch($value)
+    {
+        if (strlen($value) > 0) {
+            $this->filteredCustomers = Customer::where('id_number', 'like', '%' . $value . '%')
+                ->orWhere('first_name', 'like', '%' . $value . '%')
+                ->orWhere('last_name', 'like', '%' . $value . '%')
+                ->limit(10)
+                ->get();
+        } else {
+            $this->filteredCustomers = Customer::limit(10)->get();
+        }
     }
 
     public function addNic()
@@ -93,10 +111,18 @@ new class extends Component {
             'account_type_id' => $accountType->id,
         ];
 
-        // Auto-fill Account Type from first customer
-        $firstCustomer = $this->customer_list[0];
-        $this->account_type_name = $firstCustomer['account_type_name'];
-        $this->account_type_id = $firstCustomer['account_type_id'];
+        // Auto-fill Account Type: Joint if more than one customer, otherwise first customer's type
+        if (count($this->customer_list) > 1) {
+            $jointAccountType = SavingsAccountType::where('name', 'Joint')->first();
+            if ($jointAccountType) {
+                $this->account_type_name = $jointAccountType->name;
+                $this->account_type_id = $jointAccountType->id;
+            }
+        } else {
+            $firstCustomer = $this->customer_list[0];
+            $this->account_type_name = $firstCustomer['account_type_name'];
+            $this->account_type_id = $firstCustomer['account_type_id'];
+        }
 
         $this->reset('nic_input');
     }
@@ -107,9 +133,19 @@ new class extends Component {
         $this->customer_list = array_values($this->customer_list);
 
         if (!empty($this->customer_list)) {
-            $firstCustomer = $this->customer_list[0];
-            $this->account_type_name = $firstCustomer['account_type_name'];
-            $this->account_type_id = $firstCustomer['account_type_id'];
+            // If more than one customer remains, use Joint account type
+            if (count($this->customer_list) > 1) {
+                $jointAccountType = SavingsAccountType::where('name', 'Joint')->first();
+                if ($jointAccountType) {
+                    $this->account_type_name = $jointAccountType->name;
+                    $this->account_type_id = $jointAccountType->id;
+                }
+            } else {
+                // Only one customer left, use their account type
+                $firstCustomer = $this->customer_list[0];
+                $this->account_type_name = $firstCustomer['account_type_name'];
+                $this->account_type_id = $firstCustomer['account_type_id'];
+            }
         } else {
             $this->account_type_name = '';
             $this->account_type_id = '';
@@ -140,6 +176,13 @@ new class extends Component {
 
         // Validate form inputs before attempting DB operations
         $this->validate();
+
+        // Check if initial deposit meets minimum balance requirement
+        $accountType = SavingsAccountType::find($this->account_type_id);
+        if ($accountType && $this->balance < $accountType->min_balance) {
+            $this->addError('balance', 'Initial deposit must be at least Rs. ' . number_format($accountType->min_balance, 2) . ' for ' . $accountType->name . ' account type.');
+            return;
+        }
 
         // Generate account number
         $this->account_number = $this->generateAccountNumber();
@@ -188,6 +231,7 @@ new class extends Component {
         }
 
         $this->dispatch('toast', title: 'Savings account created successfully.');
+        session()->flash('success', 'Savings account created successfully! Account Number: ' . $this->account_number);
 
         $this->reset([
             'account_number', 'account_type_id', 'account_type_name',
@@ -199,6 +243,11 @@ new class extends Component {
 ?>
 
 <x-mary-form wire:submit.prevent="submit">
+    @if (session()->has('success'))
+        <x-mary-alert type="success" class="mb-4">
+            {{ session('success') }}
+        </x-mary-alert>
+    @endif
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -209,7 +258,20 @@ new class extends Component {
             </label>
 
             <div class="flex items-center gap-2">
-                <x-mary-input placeholder="Enter NIC and press Add" wire:model="nic_input" wire:keydown.enter.prevent="addNic" class="flex-grow" />
+                <x-mary-input 
+                    placeholder="Search by NIC, first name, or last name" 
+                    wire:model.live.debounce.300ms="customer_search"
+                    wire:model="nic_input" 
+                    wire:keydown.enter.prevent="addNic" 
+                    list="customers-list"
+                    class="flex-grow" />
+                <datalist id="customers-list">
+                    @foreach($filteredCustomers as $customer)
+                        <option value="{{ $customer->id_number }}">
+                            {{ $customer->id_number }} - {{ $customer->first_name }} {{ $customer->last_name }}
+                        </option>
+                    @endforeach
+                </datalist>
                 <x-mary-button label="Add" wire:click.prevent="addNic" class="btn-primary" />
             </div>
             @error('nic_input') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
@@ -226,23 +288,35 @@ new class extends Component {
         </div>
 
         <!-- Account Type -->
-        <x-mary-input 
-            label="Account Type" 
-            wire:model="account_type_name" 
-            readonly 
-            required 
-        />
-        <input type="hidden" wire:model="account_type_id" />
+        <div>
+            <x-mary-input 
+                label="Account Type" 
+                wire:model="account_type_name" 
+                readonly 
+                required 
+            />
+            @if($account_type_id)
+                @php
+                    $accType = \App\Models\SavingsAccountType::find($account_type_id);
+                @endphp
+                @if($accType)
+                    <p class="text-sm text-gray-600 mt-1">Minimum balance: Rs. {{ number_format($accType->min_balance, 2) }}</p>
+                @endif
+            @endif
+            <input type="hidden" wire:model="account_type_id" />
+        </div>
 
         <!-- Branch -->
         <x-mary-select label="Branch" wire:model="branch_id"
             :options="$branches"
             option-label="name"
             option-value="id"
+            placeholder="Select branch"
             required />
 
         <!-- Initial Balance -->
         <x-mary-input label="Initial Deposit" wire:model="balance" type="number" step="0.01" min="0" required />
+
 
         <!-- Opened Date -->
         <x-mary-input label="Opened Date" wire:model="opened_date" type="date" required />

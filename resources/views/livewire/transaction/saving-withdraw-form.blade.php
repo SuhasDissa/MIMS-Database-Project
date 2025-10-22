@@ -99,30 +99,25 @@ new class extends Component {
 
         $this->validate();
 
-        $fromAccount = SavingsAccount::where('account_number', $this->account_number)->first();
-
-        // // Call DB function to check withdraw ability
-        // $canWithdraw = false;
-        // try {
-        //     $result = \DB::select("SELECT can_withdraw(?, ?) as allowed", [$this->account_number, $this->amount]);
-        //     $canWithdraw = $result[0]->allowed ?? false;
-        // } catch (\Exception $e) {
-        //     $this->generalError = 'Withdrawal check failed: ' . $e->getMessage();
-        //     return;
-        // }
-
-        // if (!$canWithdraw) {
-        //     $this->generalError = 'Withdrawal not allowed: Insufficient balance, below minimum, or withdrawal limit reached.';
-        //     return;
-        // }
-
+        $fromAccount = SavingsAccount::with('accountType')->where('account_number', $this->account_number)->first();
+        if (!$fromAccount) {
+            $this->generalError = 'Account not found.';
+            return;
+        }
+        $minBalance = $fromAccount->accountType->min_balance ?? 0;
         $balanceBefore = $fromAccount->balance;
         $balanceAfter = $balanceBefore - $this->amount;
-
+        if ($this->amount > $balanceBefore) {
+            $this->generalError = 'Withdrawal amount exceeds account balance.';
+            return;
+        }
+        if ($balanceAfter < $minBalance) {
+            $this->generalError = 'Withdrawal would reduce balance below minimum required (Rs. ' . number_format($minBalance, 2) . ').';
+            return;
+        }
         $fromAccount->balance = $balanceAfter;
         $fromAccount->last_transaction_date = now();
         $fromAccount->save();
-
         SavingsTransaction::create([
             'type' => 'WITHDRAWAL',
             'from_id' => $fromAccount->id,

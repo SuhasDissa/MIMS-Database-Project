@@ -162,42 +162,32 @@ new class extends Component {
 
         $this->validate();
 
-        $fromAccount = SavingsAccount::where('account_number', $this->from_num)->first();
+        $fromAccount = SavingsAccount::with('accountType')->where('account_number', $this->from_num)->first();
         $toAccount = SavingsAccount::where('account_number', $this->to_num)->first();
-
         if (!$fromAccount || !$toAccount) {
             $this->generalError = 'Invalid accounts provided.';
             return;
         }
-
-        // Call DB function to check withdraw ability for sender
-        $canWithdraw = false;
-        try {
-            $result = \DB::select("SELECT can_withdraw(?, ?) as allowed", [$this->from_num, $this->amount]);
-            $canWithdraw = $result[0]->allowed ?? false;
-        } catch (\Exception $e) {
-            $this->generalError = 'Withdrawal check failed: ' . $e->getMessage();
-            $canWithdraw = true; // if the database doesn't support the function, allow the transfer
-        }
-
-        if (!$canWithdraw) {
-            $this->generalError = 'Transfer not allowed: Insufficient balance, below minimum, or withdrawal limit reached.';
-            return;
-        }
-
+        $minBalance = $fromAccount->accountType->min_balance ?? 0;
         $fromBalanceBefore = $fromAccount->balance;
         $toBalanceBefore = $toAccount->balance;
-
+        $fromBalanceAfter = $fromBalanceBefore - $this->amount;
+        if ($this->amount > $fromBalanceBefore) {
+            $this->generalError = 'Transfer amount exceeds sender account balance.';
+            return;
+        }
+        if ($fromBalanceAfter < $minBalance) {
+            $this->generalError = 'Transfer would reduce sender balance below minimum required (Rs. ' . number_format($minBalance, 2) . ').';
+            return;
+        }
         $fromAccount->update([
-            'balance' => $fromBalanceBefore - $this->amount,
+            'balance' => $fromBalanceAfter,
             'last_transaction_date' => now(),
         ]);
-
         $toAccount->update([
             'balance' => $toBalanceBefore + $this->amount,
             'last_transaction_date' => now(),
         ]);
-
         SavingsTransaction::create([
             'type' => 'TRANSFER',
             'from_id' => $fromAccount->id,
@@ -206,7 +196,7 @@ new class extends Component {
             'status' => 'COMPLETED',
             'description' => $this->description,
             'balance_before' => $fromBalanceBefore,
-            'balance_after' => $fromBalanceBefore - $this->amount,
+            'balance_after' => $fromBalanceAfter,
         ]);
 
         // Send notifications to sender and receiver if they have emails
