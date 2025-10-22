@@ -109,6 +109,98 @@
         </div>
     </section>
 
+    <!-- Exchange Rates Section -->
+    <section class="bg-gradient-to-r from-primary/5 to-secondary/5 py-16">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                    Live Exchange Rates
+                </h2>
+                <p class="text-lg text-gray-600 dark:text-gray-300">
+                    Current exchange rates for Sri Lankan Rupee (LKR)
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <!-- USD -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center">
+                            <span class="text-blue-600 dark:text-blue-400 font-bold">$</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">USD</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">318.52</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">US Dollar</div>
+                </div>
+
+                <!-- GBP -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center">
+                            <span class="text-indigo-600 dark:text-indigo-400 font-bold">£</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">GBP</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">390.15</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">British Pound</div>
+                </div>
+
+                <!-- INR -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
+                            <span class="text-green-600 dark:text-green-400 font-bold">₹</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">INR</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">3.82</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Indian Rupee</div>
+                </div>
+
+                <!-- JPY -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-10 h-10 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center">
+                            <span class="text-red-600 dark:text-red-400 font-bold">¥</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">JPY</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">2.11</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Japanese Yen</div>
+                </div>
+
+                <!-- KWD -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center">
+                            <span class="text-purple-600 dark:text-purple-400 font-bold">د.ك</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">KWD</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">1032.45</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Kuwaiti Dinar</div>
+                </div>
+
+                <!-- SAR -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center">
+                            <span class="text-yellow-600 dark:text-yellow-400 font-bold">﷼</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">SAR</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">84.93</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Saudi Riyal</div>
+                </div>
+            </div>
+
+            <div class="text-center mt-8 text-sm text-gray-500 dark:text-gray-400">
+                <p>Exchange rates are updated daily. Last updated: {{ now()->format('M d, Y H:i') }}</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Features Section -->
     <section id="services" class="bg-white dark:bg-gray-800 py-16 lg:py-24">
         <div class="container mx-auto px-4 lg:px-8">
