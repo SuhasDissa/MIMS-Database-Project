@@ -1,1 +1,1 @@
-<img src="{{ asset('logo_inline.svg') }}" alt="Bank Logo" {{ $attributes->merge(['class' => 'h-8 w-auto']) }} />
+<img src="{{ asset('logo_inline.svg') }}" alt="Bank Logo" {{ $attributes->merge(['class' => 'h-8 w-auto dark:brightness-0 dark:invert']) }} />
