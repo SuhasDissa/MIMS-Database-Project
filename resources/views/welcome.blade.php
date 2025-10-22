@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Welcome to Our Bank</title>
     @include('partials.head')
+    @vite(['resources/js/app.js'])
+    <style>
+        .rate-card {
+            transition: transform 0.2s;
+        }
+        .rate-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
     <!-- Navigation -->
@@ -121,82 +130,35 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <!-- USD -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center">
-                            <span class="text-blue-600 dark:text-blue-400 font-bold">$</span>
+            <div id="exchange-rates" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <!-- Exchange rates will be dynamically populated here -->
+                <template id="rate-card-template">
+                    <div class="rate-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center">
+                                <span class="text-primary font-bold currency-symbol"></span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400 currency-code"></span>
                         </div>
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">USD</span>
-                    </div>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">318.52</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">US Dollar</div>
-                </div>
-
-                <!-- GBP -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center">
-                            <span class="text-indigo-600 dark:text-indigo-400 font-bold">£</span>
+                        <div class="space-y-1">
+                            <div class="text-2xl font-bold text-gray-900 dark:text-white buying-rate"></div>
+                            <div class="text-sm text-success selling-rate"></div>
                         </div>
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">GBP</span>
+                        <div class="text-sm text-gray-500 dark:text-gray-400 currency-name"></div>
                     </div>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">390.15</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">British Pound</div>
-                </div>
-
-                <!-- INR -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
-                            <span class="text-green-600 dark:text-green-400 font-bold">₹</span>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">INR</span>
-                    </div>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">3.82</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Indian Rupee</div>
-                </div>
-
-                <!-- JPY -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-10 h-10 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center">
-                            <span class="text-red-600 dark:text-red-400 font-bold">¥</span>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">JPY</span>
-                    </div>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">2.11</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Japanese Yen</div>
-                </div>
-
-                <!-- KWD -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center">
-                            <span class="text-purple-600 dark:text-purple-400 font-bold">د.ك</span>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">KWD</span>
-                    </div>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">1032.45</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Kuwaiti Dinar</div>
-                </div>
-
-                <!-- SAR -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center">
-                            <span class="text-yellow-600 dark:text-yellow-400 font-bold">﷼</span>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">SAR</span>
-                    </div>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">84.93</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Saudi Riyal</div>
-                </div>
+                </template>
             </div>
 
-            <div class="text-center mt-8 text-sm text-gray-500 dark:text-gray-400">
-                <p>Exchange rates are updated daily. Last updated: {{ now()->format('M d, Y H:i') }}</p>
+            <div class="text-center mt-8">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Exchange rates are updated daily. Last updated: <span id="last-update-time">{{ now()->format('M d, Y H:i') }}</span>
+                </p>
+                <button id="refresh-rates" class="mt-4 btn btn-ghost btn-sm gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh Rates
+                </button>
             </div>
         </div>
     </section>
