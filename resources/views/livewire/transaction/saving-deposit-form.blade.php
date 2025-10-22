@@ -3,6 +3,8 @@
 use Livewire\Volt\Component;
 use App\Models\SavingsTransaction;
 use App\Models\SavingsAccount;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\CustomMailNotification;
 
 new class extends Component {
     public $full_name;
@@ -115,6 +117,33 @@ new class extends Component {
             'balance_before' => $balanceBefore,
             'balance_after' => $balanceAfter,
         ]);
+
+        // Send email notification to the primary customer of the account (if email exists)
+        try {
+            $customer = $toAccount->customers->first();
+            if ($customer && !empty($customer->email)) {
+                // Create a simple notifiable for sending to arbitrary email
+                $notifiable = new class {
+                    use \Illuminate\Notifications\Notifiable;
+                    public $email;
+                    public function routeNotificationForMail($notification)
+                    {
+                        return $this->email;
+                    }
+                };
+
+                $notifiable->email = $customer->email;
+                $customerName = trim(($customer->first_name ?? '') . ' ' . ($customer->last_name ?? '')) ?: null;
+
+                // Use DepositNotification to build payload
+                $payload = \App\Notifications\DepositNotification::createPayload($toAccount->account_number, (float)$this->amount, (float)$balanceAfter, $this->description, $customerName);
+
+                $notifiable->notify(new \App\Notifications\DepositNotification($payload['subject'], $payload['lines'], $payload['name']));
+            }
+        } catch (\Exception $e) {
+            // Don't block the UI if email sending fails — log if logger available
+            // logger()->error('Deposit email send failed: ' . $e->getMessage());
+        }
 
         $this->transactionMessage = 'Deposit of Rs. ' . number_format($this->amount, 2) . ' completed successfully! New balance: Rs. ' . number_format($balanceAfter, 2);
         $this->showTransactionModal = true;
