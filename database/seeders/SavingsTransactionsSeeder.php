@@ -27,8 +27,9 @@ class SavingsTransactionsSeeder extends Seeder
         $this->command->info("Creating chronological transactions for {$accounts->count()} accounts...");
 
         // Define the time period: last 12 months
+        // FIX: Corrected date order - start date should be 12 months ago, end date should be yesterday
         $startDate = now()->subMonths(12)->startOfMonth();
-        $endDate = now()->subDay(); // Go up to yesterday
+        $endDate = now()->subDay()->endOfDay(); // Go up to yesterday
 
         $this->command->info("Transaction period: {$startDate->format('Y-m-d')} to {$endDate->format('Y-m-d')}");
 
@@ -64,7 +65,8 @@ class SavingsTransactionsSeeder extends Seeder
                 $transactionCount = rand(3, 10);
 
                 for ($i = 0; $i < $transactionCount; $i++) {
-                    $daysInRange = $monthStart->diffInDays($monthEnd);
+                    // FIX: Cast diffInDays to int to avoid decimal values
+                    $daysInRange = (int) $monthStart->diffInDays($monthEnd);
                     $transactionDate = $monthStart->copy()->addDays(rand(0, $daysInRange))
                         ->setTime(rand(8, 17), rand(0, 59), rand(0, 59));
                     
@@ -197,7 +199,6 @@ class SavingsTransactionsSeeder extends Seeder
         }
 
         $this->command->info("\n=== Seeding Complete ===");
-        // ... (final stats) ...
     }
 
     /**
@@ -208,7 +209,8 @@ class SavingsTransactionsSeeder extends Seeder
         $lastCalcDate = $accountData['last_calculation_date'];
         $balance = $accountData['last_balance']; // Use the tracked balance
 
-        $days = $lastCalcDate->diffInDays($transactionDate);
+        // FIX: Cast to int to ensure whole number of days
+        $days = (int) $lastCalcDate->diffInDays($transactionDate);
 
         if ($days <= 0 || $balance <= 0) {
             return false;
@@ -249,7 +251,8 @@ class SavingsTransactionsSeeder extends Seeder
         // Update the tracker's balance to match, so it's correct for the credit.
         $accountData['last_balance'] = $balance;
 
-        $days = $lastCalcDate->diffInDays($monthEnd) + 1;
+        // FIX: Cast to int to ensure whole number of days, and add 1 for inclusive range
+        $days = (int) $lastCalcDate->diffInDays($monthEnd) + 1;
 
         if ($days <= 0 || $balance <= 0) {
             return false;
@@ -345,7 +348,6 @@ class SavingsTransactionsSeeder extends Seeder
         }
     }
 
-    // ... (helper functions getRandomDepositDescription/getRandomWithdrawalDescription are unchanged) ...
     private function getRandomDepositDescription(): string
     {
         $descriptions = [
