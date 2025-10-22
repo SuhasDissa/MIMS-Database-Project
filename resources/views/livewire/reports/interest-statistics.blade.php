@@ -119,7 +119,7 @@ new class extends Component {
                     [
                         'label' => 'Monthly Interest (Rs.)',
                         'data' => array_column($monthlyInterest, 'interest'),
-                        'fill' => true,
+                        'fill' => false,
                     ]
                 ]
             ]
@@ -325,17 +325,7 @@ new class extends Component {
             @php
                 $seniorInterest = collect($interestByCustomerStatus)->firstWhere('name', 'Senior')['value'] ?? 0;
                 $totalDistributed = array_sum(array_column($interestByCustomerStatus, 'value'));
-                $seniorPercentage = $totalDistributed > 0 ? ($seniorInterest / $totalDistributed) * 100 : 0;
             @endphp
-            <div class="flex items-start gap-3 p-4 bg-base-200 rounded-lg">
-                <x-mary-icon name="o-user-group" class="w-6 h-6 text-info" />
-                <div>
-                    <div class="text-sm font-semibold">Senior Citizen Benefits</div>
-                    <div class="text-xs text-gray-600 mt-1">
-                        {{ number_format($seniorPercentage, 1) }}% of total interest goes to seniors
-                    </div>
-                </div>
-            </div>
 
             <div class="flex items-start gap-3 p-4 bg-base-200 rounded-lg">
                 <x-mary-icon name="o-chart-bar" class="w-6 h-6 text-accent" />

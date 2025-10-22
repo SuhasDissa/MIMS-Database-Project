@@ -75,40 +75,14 @@ class DatabaseSeeder extends Seeder
         Customer::factory(100)->create();
         SavingsAccount::factory(500)->create();
 
+        // Savings transactions seeder now handles interest calculation at month ends
         $this->call(SavingsTransactionsSeeder::class);
+
         $this->call(FixedDepositsSeeder::class);
 
-        // Use automated interest calculation commands instead of manual seeder
-        $this->command->info('Calculating historical interest for savings accounts...');
-        $this->calculateHistoricalInterest();
-
+        // Calculate historical interest for fixed deposits
         $this->command->info('Calculating historical interest for fixed deposits...');
         $this->calculateHistoricalFdInterest();
-    }
-
-    /**
-     * Calculate and credit historical interest for savings accounts
-     */
-    private function calculateHistoricalInterest(): void
-    {
-        // Calculate interest for the last 3 months and credit them
-        for ($i = 3; $i >= 1; $i--) {
-            $month = now()->subMonths($i)->format('Y-m');
-
-            $this->command->info("  Processing month: {$month}");
-
-            // Calculate interest
-            Artisan::call('interest:calculate-savings', [
-                '--month' => $month,
-            ]);
-
-            // Credit interest
-            Artisan::call('interest:credit-savings', [
-                '--month' => $month,
-            ]);
-        }
-
-        $this->command->info('✓ Historical savings interest calculated and credited');
     }
 
     /**
