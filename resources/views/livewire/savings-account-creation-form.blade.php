@@ -2,141 +2,212 @@
 
 use Livewire\Volt\Component;
 use App\Models\SavingsAccount;
-use App\Models\SavingsAccountType;
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\SavingsAccountType;
+use App\Models\CustomerStatusType;
 use App\Enums\AccountStatusEnum;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 new class extends Component {
-    public $accountTypes = [];
     public $branches = [];
-
+    public $branch_id = '';
     public $account_number = '';
     public $account_type_id = '';
-    public $branch_id = '';
+    public $account_type_name = '';
     public $balance = 0;
     public $status = '';
     public $opened_date = '';
-    public $customer_nics = [];
+
     public $nic_input = '';
+    public $customer_list = []; // NIC + Name + Age
 
     protected $rules = [
-        'account_number' => 'required|string|max:256|unique:savings_account,account_number',
-        'account_type_id' => 'required|exists:savings_account_type,id',
-        'branch_id' => 'required|exists:branch,id',
+        // Migration creates table `branch` (singular) so validate against that
+        'branch_id' => 'required|integer|exists:branch,id',
+        // account_type must exist in savings_account_type
+        'account_type_id' => 'required|integer|exists:savings_account_type,id',
         'balance' => 'required|numeric|min:0',
         'status' => 'required|in:ACTIVE,INACTIVE',
-        'opened_date' => 'required|date',
-        'customer_nics' => 'required|array|min:1',
     ];
 
     public function mount()
     {
-        $this->accountTypes = SavingsAccountType::where('is_active', true)
-            ->get()
-            ->map(function ($type) {
-                return ['id' => $type->id, 'name' => $type->name];
-            })
-            ->toArray();
-
+        // Load branches for dropdown
         $this->branches = Branch::all()
-            ->map(function ($branch) {
-                return ['id' => $branch->id, 'name' => $branch->branch_name];
-            })
+            ->map(fn($branch) => ['id' => $branch->id, 'name' => $branch->branch_name])
             ->toArray();
 
         $this->status = AccountStatusEnum::ACTIVE->value;
         $this->opened_date = now()->format('Y-m-d');
+
+        // Optional: set first branch as default
+        $this->branch_id = $this->branches[0]['id'] ?? null;
     }
 
     public function addNic()
     {
-        $this->validate([
-            'nic_input' => 'required|string',
-        ]);
+        $this->validate(['nic_input' => 'required|string']);
 
-        if (in_array($this->nic_input, $this->customer_nics)) {
+        // Prevent duplicate NIC
+        if (in_array($this->nic_input, array_column($this->customer_list, 'nic'))) {
             $this->addError('nic_input', 'This NIC has already been added.');
             return;
         }
 
-        $this->customer_nics[] = $this->nic_input;
+        $customer = Customer::where('id_number', $this->nic_input)->first();
+        if (!$customer) {
+            $this->addError('nic_input', 'Customer not found.');
+            return;
+        }
+
+        $age = Carbon::parse($customer->date_of_birth)->age;
+
+        // Find customer status dynamically from DB
+        $customerStatus = CustomerStatusType::where('min_age', '<=', $age)
+            ->where(function($q) use ($age) {
+                $q->where('max_age', '>=', $age)
+                  ->orWhereNull('max_age'); // For seniors
+            })
+            ->first();
+
+        if (!$customerStatus) {
+            $this->addError('nic_input', 'Customer status not found for this age.');
+            return;
+        }
+
+        // Find savings account type for this customer status
+        $accountType = SavingsAccountType::where('customer_status_id', $customerStatus->id)->first();
+        if (!$accountType) {
+            $this->addError('nic_input', 'Account type not found in DB.');
+            return;
+        }
+
+        // Add customer to list
+        $this->customer_list[] = [
+            'nic' => $customer->id_number,
+            'name' => $customer->first_name . ' ' . $customer->last_name,
+            'age' => $age,
+            'account_type_name' => $accountType->name,
+            'account_type_id' => $accountType->id,
+        ];
+
+        // Auto-fill Account Type from first customer
+        $firstCustomer = $this->customer_list[0];
+        $this->account_type_name = $firstCustomer['account_type_name'];
+        $this->account_type_id = $firstCustomer['account_type_id'];
+
         $this->reset('nic_input');
     }
 
     public function removeNic($index)
     {
-        unset($this->customer_nics[$index]);
-        $this->customer_nics = array_values($this->customer_nics);
+        unset($this->customer_list[$index]);
+        $this->customer_list = array_values($this->customer_list);
+
+        if (!empty($this->customer_list)) {
+            $firstCustomer = $this->customer_list[0];
+            $this->account_type_name = $firstCustomer['account_type_name'];
+            $this->account_type_id = $firstCustomer['account_type_id'];
+        } else {
+            $this->account_type_name = '';
+            $this->account_type_id = '';
+        }
+    }
+
+    // Generate unique account number like SA4847010164
+    protected function generateAccountNumber()
+    {
+        $prefix = 'SA';
+        $branchCode = str_pad($this->branch_id ?? rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+        do {
+            $randomDigits = rand(100000, 999999);
+            $accountNumber = $prefix . $branchCode . $randomDigits;
+            // Use direct DB table check to avoid relying on model pluralization cache during runtime
+        } while (DB::table('savings_account')->where('account_number', $accountNumber)->exists());
+
+        return $accountNumber;
     }
 
     public function submit()
     {
+        if (empty($this->customer_list)) {
+            $this->addError('customer_list', 'Please add at least one customer.');
+            return;
+        }
+
+        // Validate form inputs before attempting DB operations
         $this->validate();
 
-        $nic_numbers = array_unique($this->customer_nics);
+        // Generate account number
+        $this->account_number = $this->generateAccountNumber();
 
-        if (empty($nic_numbers)) {
-            $this->addError('customer_nics', 'Please enter at least one NIC number.');
-            return;
-        }
-
-        $customers = Customer::whereIn('id_number', $nic_numbers)->get();
-
-        if ($customers->count() !== count($nic_numbers)) {
-            $found_nics = $customers->pluck('id_number')->toArray();
-            $not_found = array_diff($nic_numbers, $found_nics);
-            $this->addError('customer_nics', 'The following NIC numbers could not be found: ' . implode(', ', $not_found));
-            return;
-        }
-
-        DB::transaction(function () use ($customers) {
-            $account = SavingsAccount::create([
-                'account_number' => $this->account_number,
-                'account_type_id' => $this->account_type_id,
-                'branch_id' => $this->branch_id,
-                'balance' => $this->balance,
-                'status' => $this->status,
-                'opened_date' => $this->opened_date,
+        try {
+            // Log the validated payload for debugging (will appear in storage/logs/laravel.log)
+            $validated = $this->validate();
+            logger()->info('SavingsAccount submit called', [
+                'validated' => $validated,
+                'customer_list' => $this->customer_list,
+                'branch_id_type' => gettype($this->branch_id),
+                'account_type_id_type' => gettype($this->account_type_id),
             ]);
 
-            $account->customers()->attach($customers->pluck('id')->toArray());
-        });
+            DB::transaction(function () {
+                // Recompute customer ids inside transaction
+                $customer_ids = Customer::whereIn('id_number', array_column($this->customer_list, 'nic'))
+                    ->pluck('id')
+                    ->toArray();
+
+                logger()->info('Customer IDs to attach', ['customer_ids' => $customer_ids]);
+
+                $account = SavingsAccount::create([
+                    'account_number' => $this->account_number,
+                    'account_type_id' => $this->account_type_id,
+                    'branch_id' => $this->branch_id,
+                    'balance' => $this->balance,
+                    'status' => $this->status,
+                    'opened_date' => $this->opened_date,
+                ]);
+
+                logger()->info('SavingsAccount created', ['id' => $account->id ?? null, 'account_number' => $account->account_number ?? null]);
+
+                if (!empty($customer_ids)) {
+                    $account->customers()->attach($customer_ids);
+                    logger()->info('Attached customers to account', ['account_id' => $account->id, 'attached' => $customer_ids]);
+                } else {
+                    logger()->warning('No customer IDs found to attach', ['account_id' => $account->id, 'customer_list' => $this->customer_list]);
+                }
+            });
+        } catch (\Throwable $e) {
+            // Log the exception and add a user-visible error
+            logger()->error('Failed to create savings account: ' . $e->getMessage(), ['exception' => $e]);
+            $this->addError('submit', 'Failed to create savings account. Check logs for details.');
+            return;
+        }
 
         $this->dispatch('toast', title: 'Savings account created successfully.');
 
-        $this->reset(['account_number', 'account_type_id', 'branch_id', 'balance', 'status', 'opened_date', 'customer_nics', 'nic_input']);
+        $this->reset([
+            'account_number', 'account_type_id', 'account_type_name',
+            'branch_id', 'balance', 'status', 'opened_date',
+            'customer_list', 'nic_input'
+        ]);
     }
-}; ?>
+};
+?>
 
-<x-mary-form wire:submit="submit">
+<x-mary-form wire:submit.prevent="submit">
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Account Number -->
-        {{-- <x-mary-input label="Account Number" wire:model="account_number" readonly /> --}}
 
-        <!-- Account Type -->
-        <x-mary-select label="Account Type" wire:model="account_type_id"
-            :options="$this->accountTypes"
-            required />
-
-        <!-- Branch -->
-        <x-mary-select label="Branch" wire:model="branch_id"
-            :options="$this->branches"
-            required />
-
-        <!-- Initial Balance -->
-        <x-mary-input label="Initial Deposit" wire:model="balance" type="number" step="0.01" min="0" required />
-
-
-        <!-- Opened Date -->
-        <x-mary-input label="Opened Date" wire:model="opened_date" type="date" required />
-
-        <!-- Customers NICs -->
+        <!-- NIC Input -->
         <div class="md:col-span-2">
             <label class="label">
                 <span class="label-text">Customer NICs</span>
             </label>
+
             <div class="flex items-center gap-2">
                 <x-mary-input placeholder="Enter NIC and press Add" wire:model="nic_input" wire:keydown.enter.prevent="addNic" class="flex-grow" />
                 <x-mary-button label="Add" wire:click.prevent="addNic" class="btn-primary" />
@@ -144,16 +215,38 @@ new class extends Component {
             @error('nic_input') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
 
             <div class="mt-4 space-y-2">
-                @foreach ($customer_nics as $index => $nic)
-                    <x-mary-list-item :item="['name' => $nic]" no-separator>
+                @foreach ($customer_list as $index => $cust)
+                    <x-mary-list-item :item="['name' => $cust['nic'].' - '.$cust['name']]" no-separator>
                         <x-slot:actions>
                             <x-mary-button icon="o-trash" wire:click.prevent="removeNic({{ $index }})" class="btn-sm btn-ghost text-red-500" />
                         </x-slot:actions>
                     </x-mary-list-item>
                 @endforeach
             </div>
-             @error('customer_nics') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
         </div>
+
+        <!-- Account Type -->
+        <x-mary-input 
+            label="Account Type" 
+            wire:model="account_type_name" 
+            readonly 
+            required 
+        />
+        <input type="hidden" wire:model="account_type_id" />
+
+        <!-- Branch -->
+        <x-mary-select label="Branch" wire:model="branch_id"
+            :options="$branches"
+            option-label="name"
+            option-value="id"
+            required />
+
+        <!-- Initial Balance -->
+        <x-mary-input label="Initial Deposit" wire:model="balance" type="number" step="0.01" min="0" required />
+
+        <!-- Opened Date -->
+        <x-mary-input label="Opened Date" wire:model="opened_date" type="date" required />
+
     </div>
 
     <!-- Button -->
