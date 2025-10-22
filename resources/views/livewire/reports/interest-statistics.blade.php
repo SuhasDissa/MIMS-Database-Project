@@ -19,56 +19,70 @@ new class extends Component {
 
     public function loadChartData(): void
     {
-        // Get interest distribution by customer status (Child, Senior, Adult)
-        $interestByCustomerStatus = DB::table('savings_account_interest_calculations as calc')
-            ->join('savings_account as acc', 'calc.account_id', '=', 'acc.id')
-            ->join('savings_account_type as type', 'acc.account_type_id', '=', 'type.id')
-            ->join('customer_status_types as status', 'type.customer_status_id', '=', 'status.id')
-            ->select('status.status_name', DB::raw('SUM(calc.interest_amount) as total_interest'))
-            ->where('calc.status', 'CREDITED')
-            ->groupBy('status.status_name')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'name' => CustomerStatusEnum::from($item->status_name)->label(),
-                    'value' => (float) $item->total_interest
-                ];
-            })
-            ->toArray();
+        $driver = DB::connection()->getDriverName();
 
-        // Get total interest paid per account type
-        $interestByAccountType = DB::table('savings_account_interest_calculations as calc')
-            ->join('savings_account as acc', 'calc.account_id', '=', 'acc.id')
-            ->join('savings_account_type as type', 'acc.account_type_id', '=', 'type.id')
-            ->select('type.name', DB::raw('SUM(calc.interest_amount) as total_interest'))
-            ->where('calc.status', 'CREDITED')
-            ->groupBy('type.name')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'name' => $item->name,
-                    'value' => (float) $item->total_interest
-                ];
-            })
-            ->toArray();
+        // Get interest distribution by customer status using database function/view
+        if ($driver === 'pgsql') {
+            $interestByCustomerStatus = collect(DB::select('SELECT * FROM get_interest_by_customer_status()'))
+                ->map(function ($item) {
+                    return [
+                        'name' => CustomerStatusEnum::from($item->status_name)->label(),
+                        'value' => (float) $item->total_interest
+                    ];
+                })
+                ->toArray();
+        } else {
+            $interestByCustomerStatus = collect(DB::select('SELECT * FROM vw_interest_by_customer_status'))
+                ->map(function ($item) {
+                    return [
+                        'name' => CustomerStatusEnum::from($item->status_name)->label(),
+                        'value' => (float) $item->total_interest
+                    ];
+                })
+                ->toArray();
+        }
 
-        // Get monthly interest trends (last 12 months)
-        $monthlyInterest = SavingsAccountInterestCalculation::where('status', 'CREDITED')
-            ->where('credited_date', '>=', now()->subMonths(12))
-            ->whereNotNull('credited_date')
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->credited_date->format('Y-m');
-            })
-            ->map(function ($group) {
-                return [
-                    'month' => $group->first()->credited_date->format('M Y'),
-                    'interest' => (float) $group->sum('interest_amount')
-                ];
-            })
-            ->sortKeys()
-            ->values()
-            ->toArray();
+        // Get total interest paid per account type using database function/view
+        if ($driver === 'pgsql') {
+            $interestByAccountType = collect(DB::select('SELECT * FROM get_interest_by_account_type()'))
+                ->map(function ($item) {
+                    return [
+                        'name' => $item->type_name,
+                        'value' => (float) $item->total_interest
+                    ];
+                })
+                ->toArray();
+        } else {
+            $interestByAccountType = collect(DB::select('SELECT * FROM vw_interest_by_account_type'))
+                ->map(function ($item) {
+                    return [
+                        'name' => $item->type_name,
+                        'value' => (float) $item->total_interest
+                    ];
+                })
+                ->toArray();
+        }
+
+        // Get monthly interest trends using database function/view
+        if ($driver === 'pgsql') {
+            $monthlyInterest = collect(DB::select('SELECT * FROM get_monthly_interest_trends(12)'))
+                ->map(function ($item) {
+                    return [
+                        'month' => date('M Y', strtotime($item->month_year . '-01')),
+                        'interest' => (float) $item->total_interest
+                    ];
+                })
+                ->toArray();
+        } else {
+            $monthlyInterest = collect(DB::select('SELECT * FROM vw_monthly_interest_trends'))
+                ->map(function ($item) {
+                    return [
+                        'month' => date('M Y', strtotime($item->month_year . '-01')),
+                        'interest' => (float) $item->total_interest
+                    ];
+                })
+                ->toArray();
+        }
 
         // Prepare chart data
         $this->customerStatusChart = [
@@ -119,47 +133,56 @@ new class extends Component {
         $totalInterestPending = SavingsAccountInterestCalculation::where('status', 'CALCULATED')->sum('interest_amount');
         $totalCalculations = SavingsAccountInterestCalculation::where('status', 'CREDITED')->count();
 
-        // Get interest distribution by customer status for legend
-        $interestByCustomerStatus = DB::table('savings_account_interest_calculations as calc')
-            ->join('savings_account as acc', 'calc.account_id', '=', 'acc.id')
-            ->join('savings_account_type as type', 'acc.account_type_id', '=', 'type.id')
-            ->join('customer_status_types as status', 'type.customer_status_id', '=', 'status.id')
-            ->select('status.status_name', DB::raw('SUM(calc.interest_amount) as total_interest'))
-            ->where('calc.status', 'CREDITED')
-            ->groupBy('status.status_name')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'name' => CustomerStatusEnum::from($item->status_name)->label(),
-                    'value' => (float) $item->total_interest
-                ];
-            })
-            ->toArray();
+        $driver = DB::connection()->getDriverName();
 
-        // Average interest rate by customer status
-        $avgInterestRates = DB::table('savings_account_type as type')
-            ->join('customer_status_types as status', 'type.customer_status_id', '=', 'status.id')
-            ->select('status.status_name', DB::raw('AVG(type.interest_rate) as avg_rate'))
-            ->groupBy('status.status_name')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'status' => CustomerStatusEnum::from($item->status_name)->label(),
-                    'rate' => (float) $item->avg_rate
-                ];
-            })
-            ->toArray();
+        // Get interest distribution by customer status using database function/view
+        if ($driver === 'pgsql') {
+            $interestByCustomerStatus = collect(DB::select('SELECT * FROM get_interest_by_customer_status()'))
+                ->map(function ($item) {
+                    return [
+                        'name' => CustomerStatusEnum::from($item->status_name)->label(),
+                        'value' => (float) $item->total_interest
+                    ];
+                })
+                ->toArray();
+        } else {
+            $interestByCustomerStatus = collect(DB::select('SELECT * FROM vw_interest_by_customer_status'))
+                ->map(function ($item) {
+                    return [
+                        'name' => CustomerStatusEnum::from($item->status_name)->label(),
+                        'value' => (float) $item->total_interest
+                    ];
+                })
+                ->toArray();
+        }
 
-        // Top 5 accounts by interest earned
-        $topAccounts = DB::table('savings_account_interest_calculations as calc')
-            ->join('savings_account as acc', 'calc.account_id', '=', 'acc.id')
-            ->select('acc.account_number', DB::raw('SUM(calc.interest_amount) as total_interest'))
-            ->where('calc.status', 'CREDITED')
-            ->groupBy('acc.id', 'acc.account_number')
-            ->orderByDesc('total_interest')
-            ->limit(5)
-            ->get()
-            ->toArray();
+        // Average interest rate by customer status using database function/view
+        if ($driver === 'pgsql') {
+            $avgInterestRates = collect(DB::select('SELECT * FROM get_avg_interest_rates_by_status()'))
+                ->map(function ($item) {
+                    return [
+                        'status' => CustomerStatusEnum::from($item->status_name)->label(),
+                        'rate' => (float) $item->avg_rate
+                    ];
+                })
+                ->toArray();
+        } else {
+            $avgInterestRates = collect(DB::select('SELECT * FROM vw_avg_interest_rates_by_status'))
+                ->map(function ($item) {
+                    return [
+                        'status' => CustomerStatusEnum::from($item->status_name)->label(),
+                        'rate' => (float) $item->avg_rate
+                    ];
+                })
+                ->toArray();
+        }
+
+        // Top 5 accounts by interest earned using database function/view
+        if ($driver === 'pgsql') {
+            $topAccounts = DB::select('SELECT * FROM get_top_accounts_by_interest(5)');
+        } else {
+            $topAccounts = DB::select('SELECT * FROM vw_top_accounts_by_interest');
+        }
 
         return [
             'totalInterestPaid' => $totalInterestPaid,
