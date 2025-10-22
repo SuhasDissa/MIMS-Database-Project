@@ -1,45 +1,67 @@
 <?php
 
 use App\Models\SavingsAccount;
-use Livewire\Volt\Component;
 use App\Models\FixedDeposit;
+use App\Models\FixedDepositType;
+use App\Models\Branch;
+use Livewire\Volt\Component;
 
 new class extends Component {
     public $fd_number;
-    public $nic_number;
-    public $fd_type;
+    public $customer_id;
+    public $fd_type_id;
     public $linked_account_id;
     public $branch_id;
-    public $interest_frequency = null;
-    public $maturity_number;
-    public $interest_payout = null;
+    public $principal_amount;
+    public $interest_freq = null;
+    public $interest_payout_option = null;
     public $auto_renewal = null;
 
-    public $fdTypeOptions = [
-        ['label' => 'Fixed', 'value' => 'fixed'],
-        ['label' => 'Recurring', 'value' => 'recurring'],
-    ];
+    public $fdTypeOptions = [];
 
     public $interestFrequencyOptions = [
-        ['label' => 'Monthly', 'value' => 'MONTHLY'],
-        ['label' => 'End', 'value' => 'END'],
+        ['name' => 'Monthly', 'id' => 'MONTHLY'],
+        ['name' => 'At Maturity', 'id' => 'END'],
     ];
 
     public $interestPayoutOptions = [
-        ['label' => 'Reinvest', 'value' => 'Reinvest'],
-        ['label' => 'Payout', 'value' => 'Payout'],
+        ['name' => 'Transfer to Savings', 'id' => 'TRANSFER_TO_SAVINGS'],
+        ['name' => 'Renew Fixed Deposit', 'id' => 'RENEW_FD'],
     ];
 
     public $autoRenewalOptions = [
-        ['label' => 'Yes', 'value' => true],
-        ['label' => 'No', 'value' => false],
+        ['name' => 'Yes', 'id' => true],
+        ['name' => 'No', 'id' => false],
     ];
+
+    public $branchOptions = [];
 
     // Linked savings account dropdown
     public $linkedAccountOptions = [];
 
     public function mount()
     {
+        // Load FD types
+        $this->fdTypeOptions = \App\Models\FixedDepositType::where('is_active', true)
+            ->get()
+            ->map(function ($type) {
+                return [
+                    'id' => $type->id,
+                    'name' => $type->name . ' (' . $type->tenure_months . ' months @ ' . $type->interest_rate . '%)',
+                ];
+            })
+            ->toArray();
+
+        // Load branches
+        $this->branchOptions = \App\Models\Branch::all()
+            ->map(function ($branch) {
+                return [
+                    'id' => $branch->id,
+                    'name' => $branch->branch_name,
+                ];
+            })
+            ->toArray();
+
         $this->linkedAccountOptions = SavingsAccount::with('customers')
             ->where('status', 'ACTIVE')
             ->get()
@@ -50,8 +72,8 @@ new class extends Component {
                     : 'No Customer';
 
                 return [
-                    'label' => $a->account_number . ' - ' . $customerName,
-                    'value' => $a->id,
+                    'name' => $a->account_number . ' - ' . $customerName,
+                    'id' => $a->id,
                 ];
             })
             ->toArray();
@@ -77,9 +99,14 @@ new class extends Component {
                 // Auto-generate FD number from linked savings account
                 $this->fd_number = $this->generateFdNumber($linkedAccount->account_number);
 
-                // Auto-fill NIC number of the first linked customer
+                // Auto-fill customer_id of the first linked customer
                 if ($linkedAccount->customers && $linkedAccount->customers->first()) {
-                    $this->nic_number = $linkedAccount->customers->first()->id_number;
+                    $this->customer_id = $linkedAccount->customers->first()->id;
+                }
+
+                // Auto-fill branch_id from the linked savings account
+                if ($linkedAccount->branch_id) {
+                    $this->branch_id = $linkedAccount->branch_id;
                 }
             }
         }
@@ -105,19 +132,25 @@ new class extends Component {
 
         $this->fd_number = $fd;
 
-        // Also set NIC if available
+        // Also set customer_id if available
         if ($linkedAccount->customers && $linkedAccount->customers->first()) {
-            $this->nic_number = $linkedAccount->customers->first()->id_number;
+            $this->customer_id = $linkedAccount->customers->first()->id;
+        }
+
+        // Also set branch_id from the linked savings account
+        if ($linkedAccount->branch_id) {
+            $this->branch_id = $linkedAccount->branch_id;
         }
     }
 
     protected $rules = [
-        'nic_number' => 'required|string|max:20|exists:customers,id_number',
-        'fd_type' => 'required|in:fixed,recurring',
-        'linked_account_id' => 'required|exists:savings_accounts,id',
-        'interest_frequency' => 'required|in:MONTHLY,END',
-        'maturity_number' => 'required|integer|min:1',
-        'interest_payout' => 'required|in:Reinvest,Payout',
+        'customer_id' => 'required|exists:customers,id',
+        'fd_type_id' => 'required|exists:fixed_deposit_type,id',
+        'linked_account_id' => 'required|exists:savings_account,id',
+        'branch_id' => 'required|exists:branch,id',
+        'principal_amount' => 'required|numeric|min:0',
+        'interest_freq' => 'required|in:MONTHLY,END',
+        'interest_payout_option' => 'required|in:TRANSFER_TO_SAVINGS,RENEW_FD',
         'auto_renewal' => 'required|boolean',
     ];
 
@@ -125,17 +158,33 @@ new class extends Component {
     {
         $this->validate();
 
+        // Get the FD type to calculate maturity date
+        $fdType = \App\Models\FixedDepositType::find($this->fd_type_id);
+        
+        $startDate = now();
+        $maturityDate = now()->addMonths($fdType->tenure_months);
+        
+        // Calculate maturity amount (simple calculation - you may need to adjust based on your business logic)
+        $interestAmount = ($this->principal_amount * $fdType->interest_rate * $fdType->tenure_months) / (12 * 100);
+        $maturityAmount = $this->principal_amount + $interestAmount;
+
         FixedDeposit::create([
             'fd_number' => $this->fd_number,
-            'nic_number' => $this->nic_number,
-            'fd_type_id' => $this->fd_type,
+            'customer_id' => $this->customer_id,
+            'fd_type_id' => $this->fd_type_id,
+            'branch_id' => $this->branch_id,
             'linked_account_id' => $this->linked_account_id,
-            'interest_frequency' => $this->interest_frequency,
-            'maturity_number' => $this->maturity_number,
-            'interest_payout' => $this->interest_payout,
+            'principal_amount' => $this->principal_amount,
+            'interest_freq' => $this->interest_freq,
+            'maturity_amount' => $maturityAmount,
+            'start_date' => $startDate,
+            'maturity_date' => $maturityDate,
+            'status' => 'ACTIVE',
+            'interest_payout_option' => $this->interest_payout_option,
             'auto_renewal' => $this->auto_renewal,
         ]);
 
+        session()->flash('success', 'Fixed Deposit created successfully!');
         $this->reset();
     }
 };
@@ -145,6 +194,11 @@ new class extends Component {
 
 
 <x-mary-form wire:submit.prevent="submit">
+    @if (session()->has('success'))
+        <x-mary-alert type="success" class="mb-4">
+            {{ session('success') }}
+        </x-mary-alert>
+    @endif
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-base w-full">
 
         <!-- Linked Account ID (Savings Account) -->
@@ -153,55 +207,76 @@ new class extends Component {
             wire:model="linked_account_id"
             wire:change="onLinkedAccountChange($event.target.value)"
             :options="$linkedAccountOptions"
-            option-label="label"
-            option-value="value"
             required
+            placeholder="Select account"
             class="text-sm w-[300px] focus:ring-0 focus:outline-none"
         />
 
         <!-- FD Number  -->
         <x-mary-input label="FD Number" wire:model="fd_number" readonly class="text-base w-[300px] focus:ring-0 focus:outline-none" />
 
-        <!-- NIC Number  -->
-        <x-mary-input label="NIC Number" wire:model="nic_number" required class="text-sm w-[300px] focus:ring-0 focus:outline-none" readonly />
+        <!-- Customer ID (Hidden, auto-filled from linked account) -->
+        <input type="hidden" wire:model="customer_id" />
+
+        <!-- Branch -->
+        <x-mary-select 
+            label="Branch"
+            wire:model="branch_id"
+            :options="$branchOptions"
+            required 
+            placeholder="Select branch"
+            class="text-sm w-[300px] focus:ring-0 focus:outline-none"
+        />
 
         <!-- FD Type -->
         <x-mary-select 
             label="FD Type"
-            wire:model="fd_type"
+            wire:model="fd_type_id"
             :options="$fdTypeOptions"
-            option-label="label"
-            option-value="value"
-            required class="text-sm w-[300px] focus:ring-0 focus:outline-none"/>
+            required 
+            placeholder="Select FD Type"
+            class="text-sm w-[300px] focus:ring-0 focus:outline-none"
+        />
 
+        <!-- Principal Amount -->
+        <x-mary-input 
+            label="Principal Amount" 
+            wire:model="principal_amount" 
+            type="number" 
+            step="0.01"
+            required 
+            class="text-sm w-[300px] focus:ring-0 focus:outline-none" 
+        />
 
-
-        
-
-        <!-- Interest Frequency in Months  -->
-        <x-mary-select label="Interest Frequency (Months)" wire:model="interest_frequency" 
+        <!-- Interest Frequency -->
+        <x-mary-select 
+            label="Interest Frequency" 
+            wire:model="interest_freq" 
             :options="$interestFrequencyOptions"
-            option-value="value"
-            option-label="label"
-            required class="text-sm w-[300px] focus:ring-0 focus:outline-none" />
+            required 
+            placeholder="Select frequency"
+            class="text-sm w-[300px] focus:ring-0 focus:outline-none" 
+        />
 
-        <!-- Maturity Number  -->
-        <x-mary-input label="Maturity Number (Months)" wire:model="maturity_number" class="text-sm w-[300px] focus:ring-0 focus:outline-none"
- />
-
-        <!-- Interest Payout  -->
-        <x-mary-select label="Interest Payout" wire:model="interest_payout" 
+        <!-- Interest Payout Option -->
+        <x-mary-select 
+            label="Interest Payout Option" 
+            wire:model="interest_payout_option" 
             :options="$interestPayoutOptions"
-            option-value="value"
-            option-label="label"
-            required class="text-sm w-[300px] focus:ring-0 focus:outline-none" />
+            required 
+            placeholder="Select interest payout option"
+            class="text-sm w-[300px] focus:ring-0 focus:outline-none" 
+        />
 
         <!-- Auto Renewal -->
-        <x-mary-select label="Auto Renewal" wire:model="auto_renewal" 
+        <x-mary-select 
+            label="Auto Renewal" 
+            wire:model="auto_renewal" 
             :options="$autoRenewalOptions"
-            option-value="value"
-            option-label="label"
-            required class="text-sm w-[300px] focus:ring-0 focus:outline-none" />
+            required 
+            placeholder="Select auto renewal option"
+            class="text-sm w-[300px] focus:ring-0 focus:outline-none" 
+        />
     </div>
 
     <!-- Button -->
