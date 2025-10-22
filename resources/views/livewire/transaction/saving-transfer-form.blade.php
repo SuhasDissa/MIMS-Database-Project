@@ -3,6 +3,8 @@
 use Livewire\Volt\Component;
 use App\Models\SavingsTransaction;
 use App\Models\SavingsAccount;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\TransferNotification;
 
 new class extends Component {
     public $sender_name;
@@ -206,6 +208,47 @@ new class extends Component {
             'balance_before' => $fromBalanceBefore,
             'balance_after' => $fromBalanceBefore - $this->amount,
         ]);
+
+        // Send notifications to sender and receiver if they have emails
+        try {
+            $sender = $fromAccount->customers->first();
+            $receiver = $toAccount->customers->first();
+
+            $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : null;
+            $receiverName = $receiver ? trim(($receiver->first_name ?? '') . ' ' . ($receiver->last_name ?? '')) : null;
+
+            if ($sender && !empty($sender->email)) {
+                $notifiableSender = new class {
+                    use \Illuminate\Notifications\Notifiable;
+                    public $email;
+                    public function routeNotificationForMail($notification)
+                    {
+                        return $this->email;
+                    }
+                };
+                $notifiableSender->email = $sender->email;
+
+                $payload = \App\Notifications\TransferNotification::createPayload($fromAccount->account_number, $toAccount->account_number, (float)$this->amount, (float)$fromAccount->balance, (float)$toAccount->balance, $this->description, $senderName);
+                $notifiableSender->notify(new \App\Notifications\TransferNotification($payload['subject'], $payload['lines'], $payload['name']));
+            }
+
+            if ($receiver && !empty($receiver->email)) {
+                $notifiableReceiver = new class {
+                    use \Illuminate\Notifications\Notifiable;
+                    public $email;
+                    public function routeNotificationForMail($notification)
+                    {
+                        return $this->email;
+                    }
+                };
+                $notifiableReceiver->email = $receiver->email;
+
+                $payload = \App\Notifications\TransferNotification::createPayload($fromAccount->account_number, $toAccount->account_number, (float)$this->amount, (float)$fromAccount->balance, (float)$toAccount->balance, $this->description, $receiverName);
+                $notifiableReceiver->notify(new \App\Notifications\TransferNotification($payload['subject'], $payload['lines'], $payload['name']));
+            }
+        } catch (\Exception $e) {
+            // logger()->error('Transfer email send failed: ' . $e->getMessage());
+        }
 
         $this->transactionMessage = 'Transfer of Rs. ' . number_format($this->amount, 2) . ' completed successfully! From: ' . $this->from_num . ' to ' . $this->to_num;
         $this->showTransactionModal = true;

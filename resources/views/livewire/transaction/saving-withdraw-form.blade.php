@@ -3,6 +3,8 @@
 use Livewire\Volt\Component;
 use App\Models\SavingsTransaction;
 use App\Models\SavingsAccount;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\WithdrawNotification;
 
 new class extends Component {
     public $full_name;
@@ -99,20 +101,20 @@ new class extends Component {
 
         $fromAccount = SavingsAccount::where('account_number', $this->account_number)->first();
 
-        // Call DB function to check withdraw ability
-        $canWithdraw = false;
-        try {
-            $result = \DB::select("SELECT can_withdraw(?, ?) as allowed", [$this->account_number, $this->amount]);
-            $canWithdraw = $result[0]->allowed ?? false;
-        } catch (\Exception $e) {
-            $this->generalError = 'Withdrawal check failed: ' . $e->getMessage();
-            return;
-        }
+        // // Call DB function to check withdraw ability
+        // $canWithdraw = false;
+        // try {
+        //     $result = \DB::select("SELECT can_withdraw(?, ?) as allowed", [$this->account_number, $this->amount]);
+        //     $canWithdraw = $result[0]->allowed ?? false;
+        // } catch (\Exception $e) {
+        //     $this->generalError = 'Withdrawal check failed: ' . $e->getMessage();
+        //     return;
+        // }
 
-        if (!$canWithdraw) {
-            $this->generalError = 'Withdrawal not allowed: Insufficient balance, below minimum, or withdrawal limit reached.';
-            return;
-        }
+        // if (!$canWithdraw) {
+        //     $this->generalError = 'Withdrawal not allowed: Insufficient balance, below minimum, or withdrawal limit reached.';
+        //     return;
+        // }
 
         $balanceBefore = $fromAccount->balance;
         $balanceAfter = $balanceBefore - $this->amount;
@@ -131,6 +133,30 @@ new class extends Component {
             'balance_before' => $balanceBefore,
             'balance_after' => $balanceAfter,
         ]);
+
+        // Send email notification to the account owner (if email exists)
+        try {
+            $customer = $fromAccount->customers->first();
+            if ($customer && !empty($customer->email)) {
+                $notifiable = new class {
+                    use \Illuminate\Notifications\Notifiable;
+                    public $email;
+                    public function routeNotificationForMail($notification)
+                    {
+                        return $this->email;
+                    }
+                };
+
+                $notifiable->email = $customer->email;
+                $customerName = trim(($customer->first_name ?? '') . ' ' . ($customer->last_name ?? '')) ?: null;
+
+                $payload = \App\Notifications\WithdrawNotification::createPayload($fromAccount->account_number, (float)$this->amount, (float)$balanceAfter, $this->description, $customerName);
+
+                $notifiable->notify(new \App\Notifications\WithdrawNotification($payload['subject'], $payload['lines'], $payload['name']));
+            }
+        } catch (\Exception $e) {
+            // logger()->error('Withdrawal email send failed: ' . $e->getMessage());
+        }
 
         $this->transactionMessage = 'Withdrawal of Rs. ' . number_format($this->amount, 2) . ' completed successfully! New balance: Rs. ' . number_format($balanceAfter, 2);
         $this->showTransactionModal = true;
