@@ -180,14 +180,8 @@ new class extends Component {
             $this->generalError = 'Transfer would reduce sender balance below minimum required (Rs. ' . number_format($minBalance, 2) . ').';
             return;
         }
-        $fromAccount->update([
-            'balance' => $fromBalanceAfter,
-            'last_transaction_date' => now(),
-        ]);
-        $toAccount->update([
-            'balance' => $toBalanceBefore + $this->amount,
-            'last_transaction_date' => now(),
-        ]);
+        
+        // Create transaction - database trigger will automatically update account balances
         SavingsTransaction::create([
             'type' => 'TRANSFER',
             'from_id' => $fromAccount->id,
@@ -198,6 +192,10 @@ new class extends Component {
             'balance_before' => $fromBalanceBefore,
             'balance_after' => $fromBalanceAfter,
         ]);
+        
+        // Refresh accounts to get updated balances from database trigger
+        $fromAccount->refresh();
+        $toAccount->refresh();
 
         // Send notifications to sender and receiver if they have emails
         try {

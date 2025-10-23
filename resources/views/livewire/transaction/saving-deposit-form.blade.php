@@ -103,10 +103,7 @@ new class extends Component {
         $balanceBefore = $toAccount->balance;
         $balanceAfter = $balanceBefore + $this->amount;
 
-        $toAccount->balance = $balanceAfter;
-        $toAccount->last_transaction_date = now();
-        $toAccount->save();
-
+        // Create transaction - database trigger will automatically update account balance
         SavingsTransaction::create([
             'type' => 'DEPOSIT',
             'from_id' => null,
@@ -117,6 +114,9 @@ new class extends Component {
             'balance_before' => $balanceBefore,
             'balance_after' => $balanceAfter,
         ]);
+        
+        // Refresh account to get updated balance from database trigger
+        $toAccount->refresh();
 
         // Send email notification to the primary customer of the account (if email exists)
         try {
