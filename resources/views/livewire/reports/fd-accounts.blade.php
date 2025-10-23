@@ -23,7 +23,10 @@ new class extends Component {
                 $query->where(function ($q) {
                     $q->where('fd_number', 'like', '%' . $this->search . '%')
                       ->orWhereHas('customer', function ($customerQuery) {
-                          $customerQuery->where('name', 'like', '%' . $this->search . '%');
+                          $customerQuery->where(function ($c) {
+                              $c->where('first_name', 'like', '%' . $this->search . '%')
+                                ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                          });
                       });
                 });
             })

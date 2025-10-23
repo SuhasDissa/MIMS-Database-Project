@@ -60,6 +60,8 @@ new class extends Component {
             'id_type' => $this->id_type,
             'id_number' => $this->id_number,
             'status_id' => $this->status_id,
+            // Attach the currently authenticated employee creating this customer
+            'employee_id' => auth()->id(),
             'branch_id' => $this->branch_id,
         ];
 
