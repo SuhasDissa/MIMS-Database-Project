@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp('credited_date')->nullable();
             $table->timestamps();
             $table->foreignId('transaction_id')->nullable()->constrained('savings_transaction');
+            $table->index(['account_id','status']);
         });
     }
 

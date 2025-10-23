@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('transaction_id')->nullable()->constrained('fd_transaction');
             $table->timestamp('processed_date')->nullable();
             $table->timestamps();
+            $table->index(['fd_id','action_taken']);
         });
     }
 

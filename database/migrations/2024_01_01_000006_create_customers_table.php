@@ -26,6 +26,8 @@ return new class extends Migration
             $table->foreignId('employee_id')->constrained('employee');
             $table->foreignId('branch_id')->constrained('branch');
             $table->timestamps();
+            $table->index(['first_name','last_name']);
+            $table->index(['email','phone']);
         });
     }
 

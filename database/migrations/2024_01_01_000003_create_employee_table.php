@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('branch_id')->constrained('branch');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->index(["first_name","last_name"]) ;
         });
     }
 

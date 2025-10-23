@@ -19,6 +19,8 @@ return new class extends Migration
             $table->date('closed_date')->nullable();
             $table->date('last_transaction_date')->nullable();
             $table->timestamps();
+            $table->index(['account_number']);
+            
         });
     }
 

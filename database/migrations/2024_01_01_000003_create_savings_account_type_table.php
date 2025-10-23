@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('description', 256)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+            $table->index(['first_name',"last_name"]);
         });
     }
 

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->boolean('auto_renewal')->default(false);
             $table->date('closed_date')->nullable();
             $table->timestamps();
+            $table->index(['fd_number','status']);
         });
     }
 
