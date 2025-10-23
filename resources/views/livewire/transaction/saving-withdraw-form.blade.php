@@ -115,9 +115,8 @@ new class extends Component {
             $this->generalError = 'Withdrawal would reduce balance below minimum required (Rs. ' . number_format($minBalance, 2) . ').';
             return;
         }
-        $fromAccount->balance = $balanceAfter;
-        $fromAccount->last_transaction_date = now();
-        $fromAccount->save();
+        
+        // Create transaction - database trigger will automatically update account balance
         SavingsTransaction::create([
             'type' => 'WITHDRAWAL',
             'from_id' => $fromAccount->id,
@@ -128,6 +127,9 @@ new class extends Component {
             'balance_before' => $balanceBefore,
             'balance_after' => $balanceAfter,
         ]);
+        
+        // Refresh account to get updated balance from database trigger
+        $fromAccount->refresh();
 
         // Send email notification to the account owner (if email exists)
         try {
